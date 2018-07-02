@@ -3,10 +3,10 @@
   "checkFlag": false,
   "listOfDictionaries": [
     { "name": "A",
-      "value": 1.7,
+      "value": 1.7
     },
     { "name": "B",
-      "value": 1.74e-4,
+      "value": 1.74e-4
     }
   ],
   "paramB": 2
