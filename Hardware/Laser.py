@@ -44,7 +44,8 @@ class Laser:
         """
         Enables the laser.
         """
-        # opens the serial port
+        # closes and then opens the serial port to avoid an error
+        self.port.close()
         self.port.open()
         # turns the system on by writing to the port
         self.port.write('system=1\r'.encode('utf-8'))
@@ -57,7 +58,8 @@ class Laser:
         """
         Disables the laser.
         """
-        # opens the serial port
+        # closes and then opens the serial port to avoid an error
+        self.port.close()
         self.port.open()
         # turns off the channels and disconnects the laser
         self.port.write('enable=0\r'.encode('utf-8'))
@@ -71,7 +73,8 @@ class Laser:
         """
         Gets the status of the laser and returns it.
         """
-        # opens the port
+        # closes and then opens the serial port to avoid an error
+        self.port.close()
         self.port.open()
         # asks the laser's status
         self.port.write('statword?\r'.encode('utf-8'))
@@ -79,7 +82,7 @@ class Laser:
         # reads in the status one bit at a time
         statword = ""
         while self.port.in_waiting > 0:
-            statword += self.port.read(1)
+            statword += str(self.port.read(1))
         time.sleep(1)
         # closes the port
         self.port.close()
@@ -89,7 +92,8 @@ class Laser:
         """
         Chagces the current (in mA) of a specific channel of the laser
         """
-        # opens the serial port
+        # closes and then opens the serial port to avoid an error
+        self.port.close()
         self.port.open()
         
         # sets the max current level
@@ -110,22 +114,22 @@ class Laser:
             print('No Way! current must be less than ' + max_current + ' mA only.')
         elif current == 0:
             # sets the channel
-            self.port.write(('channel=' + channel + '\r').encode('utf-8'))
+            self.port.write(('channel=' + str(channel) + '\r').encode('utf-8'))
             time.sleep(2)
             # turns off the channel because currrent = 0
             self.port.write('enable=0\r'.encode('utf-8'))
             time.sleep(1)
         else:
             # changes the channel
-            self.port.write(('channel=' + channel + '\r').encode('utf-8'))
+            self.port.write(('channel=' + str(channel) + '\r').encode('utf-8'))
             self.channel = channel
             time.sleep(2)
             # turns on the correct channel
-            self.port.write(('enable=' + channel + '\r').encode('utf-8'))
+            self.port.write(('enable=' + str(channel) + '\r').encode('utf-8'))
             self.status = 'enabled'
             time.sleep(2)
             # changes the current on the channel
-            self.port.write(('current=' + current + '\r').encode('utf-8'))
+            self.port.write(('current=' + str(current) + '\r').encode('utf-8'))
             self.current = current
             time.sleep(1)
         # closes the serial port
@@ -138,10 +142,11 @@ class Laser:
         with the x and y coordinates and the intensity for first the central
         peak and then the secondary one
         """
+        SATURATION =30900
         # sets the current to a low setting for first image
         self.changeCurrent(10, self.channel)
 ### get updated values for taking the first pic
-        image = camera.avgimg(.3, 10)
+        image = camera.avgimg(.1, 3)
         image = np.transpose(image)
         # finds pixel with highest value
         maximum = np.amax(image)
@@ -175,11 +180,26 @@ class Laser:
         secondY = secondParams[1] + (y - length)
         secondX = secondParams[2] + (x - length)
         # changes the current to the higher value
-        self.changeCurrent(50, self.channel)
-        # takes a new image on the camera
-        newImage = camera.avgImg(.0001, 10)
-        # finds the value of the second peak in the new image
-        newSecondPeak = newImage[int(secondY)][int(secondX)]
+        newCurrent = 40
+        intensity = 0
+        # changes power until the second peak intensity falls within 70-80%
+        # of saturation
+        counter = 0
+        while intensity < .7 * SATURATION or intensity > .8 * SATURATION:
+            if intensity < .7:
+                newCurrent += 5
+            else:
+                newCurrent -= 2
+            # changes the current
+            self.changeCurrent(newCurrent, self.channel)
+            # takes a new image on the camera
+            newImage = camera.avgImg(.0001, 3)
+            # finds the value of the second peak in the new image
+            intensity = newImage[int(secondY)][int(secondX)]
+            counter += 1
+            if counter == 10:
+                raise Exception("Laser calibration timeout. Please try again")
+        newSecondPeak = intensity
         # finds a scale factor for the intensities
         scale = newSecondPeak / secondParams[0]
         # calculates the newCenterPeak from the scale

@@ -196,20 +196,33 @@ class Camera:
         self.imgSize = (self.handle.NumX, self.handle.Numy)
         self.binPix = (self.handle.BinX, self.handle.BinY)
     
-    def avgimg(self, expTime, numIm):
+    def avgimg(self, expTime, numIm, darkCam = None):
         """
         Uses this class's exposure function to take numIm imgaes of exposure
         time expTime. It then returns the mean of the images.
         """
         if self.handle == None:
             raise Exception('Camera not connected.')
+        # checks to see if a darkCam has been provided
+        if darkCam == None:
+            # no darkCam is provided so it takes a new one with current camera
+            # settings
+            darkCam = self.takeDarkCam(.1, 30, self.binPix[0], self.binPix[1])
+        elif reversed(np.shape(darkCam)) != self.imgSize:
+            # darkCam properties and current image size don't match. Raises an 
+            # errror
+            raise Exception("Provided dark cam image does not have the same "
+                            "dimensions as the exposure properties. Change one "
+                            "or the other, or take a new dark cam.")
         self.handle.ReadoutSpeed = 1
 ##### ask christain about switching these
         img = np.zeros((self.imgSize[0], self.imgSize[1]), np.int32)
         for i in range(numIm):
             img = img + self.exposure(expTime)
         # output is a float64 (2758, 2208) array
-        return img / numIm
+        avgImg = img/numIm
+        avgImgCorrected = avgImg - darkCam
+        return np.rot90(avgImgCorrected)
     
     def takeDarkCam(self, expTime, numIm, BinX, BinY):
         """
@@ -222,11 +235,11 @@ class Camera:
         self.shutter(False)
         self.shutterpriority(0)
         self.readoutspeed(0)
-        self.exposureproperties((0,0,), (500, 500), (BinX, BinY))
+        #self.exposureproperties((0,0,), (500, 500), (BinX, BinY))
         # take dark image
         darkCam = self.avgimg(expTime, numIm)
         # save picture
-        os.chdir('C:\Lab\FPWC\hardware')
+        os.chdir('C:\Lab\HCIL\hardware')
 ######### confirm format for saving picture and then save it
 #        np.savetxt('darkCam.txt', darkCam)
         np.save('darkCam.npy', darkCam)

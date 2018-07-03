@@ -6,7 +6,8 @@
 # Brief usage:
 #   Connect:
 #       motor = Motor
-#       motor.connect()
+#       sn = 45862339 or sn = 83815669 horiz. or sn = 83815646 vert.
+#       motor.connect(sn)
 #   Motion:
 #       motor.goto(pos)  # Ranges from 0 to 300
 #       motor.goto_wait(pos)  # careful this times out
@@ -29,6 +30,9 @@
 from matplotlib import pyplot as plt
 import win32com.client
 import time
+help(win32com.client.DispatchWithEvents)
+help(win32com.client.DispatchEx)
+help(win32com.client.Dispatch)
 
 class Motor:
     
@@ -39,7 +43,7 @@ class Motor:
         self.motor_id = 0
         self.serial_number = None
         
-    def connect(self):
+    def connect(self, sn):
         # create controls
         plt.close('all')
         self.figure = plt.figure(figsize = (650, 450))
@@ -53,7 +57,7 @@ class Motor:
             print('No motors found!')
 #        if n_motor != 1:
 #            print('Wrong number of motors found...')
-        self.serial_number = '45862339'
+        self.serial_number = sn
         # creates an ActiveX controller for the specific motor
         self.stage = win32com.client.Dispatch('MGMOTOR.MGMotorCtrl.1')
         # sets the motors serial number so the connection can be established
@@ -160,3 +164,24 @@ class Motor:
         """
         self.ctrl.StopCtrl()
         self.stage.StopCtrl()
+    def changeFocalPlaneMask(self, num):
+        if num == 1:
+            pass
+        elif num == 2:
+            pass
+        elif num == 3:
+            pass
+        elif num == 4:
+            pass
+        elif num == 5:
+            pass
+        elif num == 6:
+            pass
+        elif num == 7:
+            pass
+        elif num == 8:
+            pass
+        elif num == 9:
+            pass
+        else:
+            raise Exception("Focal Plane Mask number must be 1 - 9.")
