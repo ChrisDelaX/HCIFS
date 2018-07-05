@@ -4,7 +4,8 @@
 # Based on a Matlab function developed by He Sun
 #Brief Usage:
 #    To enable the laser:
-#        laser = Laser('COM3', 115200, 8, 1)
+#       # specs is an optional dictionary of default values to change
+#        laser = Laser(specs) 
 #        laser.enable()
 #    To disable the laser:
 #        laser.disable()
@@ -29,18 +30,24 @@ import numpy as np
 
 class Laser:
     
-    def __init__(self, P, BR, DB, SB):
+    def __init__(self, **keywords):
         """
         Creats an instance of the Laser class. Creates a port attribute to
         hold the connection to the laser.
         """
         # connects to the laser
-        self.port = s.Serial(port = P, baudrate = BR, 
-                             bytesize = DB, stopbits = SB)
-        self.current = None
-        self.channel = None
-    
-    def enable(self, enableStatus):
+        defaults = {
+                'port': 'COM3', 'baudrate': 115200, 'bytesize': 8,
+                'stopbits': 1, 'current': 50, 'channel': 1, 
+                'lengthOfCalibrationArea': 10
+                }
+        self.specs = defaults
+        self.specs.update(keywords)
+        self.port = s.Serial(port = self.specs['port'], 
+                             baudrate = self.specs['baudrate'], 
+                             bytesize = self.specs['bytesize'],
+                             stopbits = self.specs['stopbits'])
+    def enable(self):
         """
         Enables the laser.
         """
@@ -122,29 +129,29 @@ class Laser:
         else:
             # changes the channel
             self.port.write(('channel=' + str(channel) + '\r').encode('utf-8'))
-            self.channel = channel
+            self.specs['channel'] = channel
             time.sleep(2)
             # turns on the correct channel
             self.port.write(('enable=' + str(channel) + '\r').encode('utf-8'))
-            self.status = 'enabled'
             time.sleep(2)
             # changes the current on the channel
             self.port.write(('current=' + str(current) + '\r').encode('utf-8'))
-            self.current = current
+            self.specs['current'] = current
             time.sleep(1)
         # closes the serial port
         self.port.close()
     
-    def calibrate(self, image, length, camera):
+    def calibrate(self, camera):
         """
         Calibrates the laser so that the central peak is overasaturated, and
         the second peaks are just below saturated. It then returns two tuples
         with the x and y coordinates and the intensity for first the central
         peak and then the secondary one
         """
+        length = self.specs['length']
         SATURATION =30900
         # sets the current to a low setting for first image
-        self.changeCurrent(10, self.channel)
+        self.changeCurrent(10, self.specs['channel'])
 ### get updated values for taking the first pic
         image = camera.avgimg(.1, 3)
         image = np.transpose(image)
@@ -191,7 +198,7 @@ class Laser:
             else:
                 newCurrent -= 2
             # changes the current
-            self.changeCurrent(newCurrent, self.channel)
+            self.changeCurrent(newCurrent, self.specs['channel'])
             # takes a new image on the camera
             newImage = camera.avgImg(.0001, 3)
             # finds the value of the second peak in the new image

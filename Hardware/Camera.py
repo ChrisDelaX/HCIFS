@@ -14,7 +14,7 @@
 #    Setup the camera:
 #       camera.setup()
 #    Initilialization:
-#        camera.init(ccdtemp) # ccdtemp range: (-50, 50)
+#        camera.init()
 #    Stop fan and cooler:
 #        camera.finalize()
 #    Disable the camera:
@@ -54,25 +54,21 @@ class Camera:
     settings, and taking images.
     """
     
-    def __init__(self):
+    def __init__(self, **keywords):
         """
         Creates an instance of the Camera class, and initializes the
         default value.
         """
-        
+        defaults = {
+                'serialnum': '0', 'shutterStatus': True,'startPos': (0, 0),
+                'imgSize': (500, 500), 'binPix': (4, 4), 'ccdtemp': -15,
+                'name': 'QSICamera.CCDCamera', 'newDarkFrame': True,
+                'darkCam': None, 'binXiL': 4, 'binEta': 4
+                }
         self.handle = None
-        self.serialnum = '0'
-        self.shutterStatus = True
-        self.startPos = (0, 0)
-        self.imgSize = (0, 0)
-        self.binPix = (0, 0)
-        self.ccdtemp = None
-        self.name = None
-        self.newDarkFrame = True
-        self.darkFrame = None
-        self.binXi = 4
-        self.binEta = 4
-
+        self.specs = defaults
+        self.specs.update(keywords)
+            
     def connect(self):
         """
         Connects the camera, opens the shutter, and sets variables
@@ -82,19 +78,20 @@ class Camera:
         try:
             # get a handle of the camera
             if self.handle == None:
-                self.handle = win32com.client.Dispatch(self.name)
+                self.handle = win32com.client.Dispatch(self.specs['name'])
             # connect the camera
             if self.handle.Connected == False:
                 print('Connecting camera')
                 self.handle.Connected = True
             else:
                 print('Camera is already connected.')
-            # get current parameters from the camera
-            self.serialnum = self.handle.SerialNumber;
-            self.imgSize = (self.handle.NumX, self.handle.NumY)
-            self.startPos = (self.handle.StartX, self.handle.StartY)
-            self.binPix = (self.handle.BinX, self.handle.BinY)
-            self.ccdtemp = self.handle.SetCCDTemperature
+            # get serial number from the camera
+            self.specs['serialnum'] = self.handle.SerialNumber;
+            # set specs parameters to the camera
+            self.exposureproperties(self.specs.get('startPos'), 
+                                    self.specs.get('imgSize'), 
+                                    self.specs.get('binPix'))
+            # open the shutter
             self.shutter(True)
         except Exception as ex:
             if ex == AttributeError:
@@ -119,12 +116,13 @@ class Camera:
         print('Disconnecting camera')
         self.handle = None
     
-    def init(self, ccdtemp):
+    def init(self):
         """
         Turns on the fan and cooler. It also sets the temperature to ccdtemp.
         """
         if self.handle == None:
             raise Exception('Camera not connected.')
+        ccdtemp = self.specs['ccdtemp']
         if (ccdtemp < -50) or (ccdtemp > 50):
             raise ValueError('Temperature is not in the correct range.')
         # sets the current camera as the main camera
@@ -139,7 +137,6 @@ class Camera:
         # set camera cooling temperature and update ccdtemp attribute
         if self.handle.CanSetCCDTemperature == True:
             self.handle.SetCCDTemperature = ccdtemp
-            self.ccdtemp = self.handle.SetCCDTemperature
         # set camera gain to self gain
         if self.handle.CameraGain != 1:
             self.handle.CameraGain = 1
@@ -159,7 +156,7 @@ class Camera:
             self.handle.ManualShutterMode = True
             # Open the shutter as specified
             self.handle.ManualShutterOpen = True
-            self.shutterStatus = True
+            self.specs['shutterStatus'] = True
         elif openflag == False:
             # Set the camera to manual shutter mode
             self.handle.ManualShutterMode = True
@@ -167,7 +164,7 @@ class Camera:
             self.handle.ManualShutterOpen = False
             # Set the camera to auto shutter mode
             self.handle.ManualShutterMode = False
-            self.shutterStatus = False;
+            self.specs['shutterStatus'] = False;
         else:
             raise ValueError('Openflag must be True or False.')
             
@@ -192,15 +189,16 @@ class Camera:
         self.handle.BinX = binPix[0]
         self.handle.BinY = binPix[1]
         # update the camera attributes
-        self.startPos = (self.handle.StartX, self.handle.StartY)
-        self.imgSize = (self.handle.NumX, self.handle.Numy)
-        self.binPix = (self.handle.BinX, self.handle.BinY)
+        self.specs['startPos'] = (self.handle.StartX, self.handle.StartY)
+        self.specs['imgSize'] = (self.handle.NumX, self.handle.Numy)
+        self.specs['binPix'] = (self.handle.BinX, self.handle.BinY)
     
-    def avgimg(self, expTime, numIm, darkCam = None):
+    def avgimg(self, expTime, numIm):
         """
         Uses this class's exposure function to take numIm imgaes of exposure
         time expTime. It then returns the mean of the images.
         """
+        darkCam = self.specs['darkCam']
         if self.handle == None:
             raise Exception('Camera not connected.')
         # checks to see if a darkCam has been provided
@@ -238,6 +236,7 @@ class Camera:
         #self.exposureproperties((0,0,), (500, 500), (BinX, BinY))
         # take dark image
         darkCam = self.avgimg(expTime, numIm)
+        self.specs['darkCam'] = darkCam
         # save picture
         os.chdir('C:\Lab\HCIL\hardware')
 ######### confirm format for saving picture and then save it
@@ -253,7 +252,7 @@ class Camera:
         if self.handle == None:
             raise Exception('Camera not connected.')
         # Starts an exposure on the camera
-        self.handle.StartExposure(expTime, self.shutterStatus)
+        self.handle.StartExposure(expTime, self.specs['shutterStatus'])
         # Wait for the exposure to complete
         done = self.handle.ImageReady
         while done != True:
@@ -315,7 +314,7 @@ class Camera:
             self.handle.CoolerOn = False
         # closes the shutter
         self.shutter(False)
-        self.shutterStatus = False
+        self.specs['shutterStatus'] = False
         
     def disable(self):
         """

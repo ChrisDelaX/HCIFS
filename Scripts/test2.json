@@ -1,0 +1,14 @@
+{
+  "camera": {
+    "imgSize": [1000,1000],
+    "ccdtemp": -14
+  }
+  "laser": {
+    "channel": 1,
+    "current": 50
+  }
+  "lab": {
+    "Nitr": 30,
+    "cRange": (-8, -3)
+  }
+}
