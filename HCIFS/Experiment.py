@@ -1,38 +1,42 @@
-from Hardware.Camera import Camera
-from Hardware.Laser import Laser
-from Hardware.Motor import Motor
-import os
+#from Hardware.Camera import Camera
+#from Hardware.Laser import Laser
+#from Hardware.Motor import Motor
+import os.path
 import json
 
 
-class HCIL(object):
+class Experiment(object):
     
-    def __init__(self, JSONfile=None, **keywords):
+    def __init__(self, JSONfile=None, **specs):
     
         # default JSON script file
         if JSONfile is None:
-            JSONfile = 'C:/Lab/HCIL/Scripts/test.json'
+            JSONfile = 'sampleScript_Lab_FPWC.json'
+        # expand environmental variables
+        JSONfile = os.path.expandvars(JSONfile)
         # asserts given file is a file
-        assert os.path.isfile(JSONfile), "%s is not a file."
-        # load JSON script file
+        assert os.path.isfile(JSONfile), "%s is not a file."%JSONfile
+        
         try:
-            script = json.loads(open(JSONfile).read())
+            # load JSON script file
+            self.specs = json.loads(open(JSONfile).read())
+            # use specs keyword arguments to override JSON script
+            self.specs.update(specs)
         except ValueError as error:
             print("Error: script file is formatted incorrectly.")
             raise ValueError(error)
-        self.specs = script
-        # uses keyword arguments to override JSON script
-        self.specs.update(keywords)
+        
+        
         
         # initialize hardware
-        self.Camera = Camera(**self.specs)
-        self.Laser = Laser(**self.specs)
-        self.HorizontalMotor = Motor("h", **self.specs)
-        self.VeritcalMotor = Motor("v", **self.specs)
+#        self.Camera = Camera(**self.specs)
+#        self.Laser = Laser(**self.specs)
+#        self.HorizontalMotor = Motor("h", **specs)
+#        self.VeritcalMotor = Motor("v", **specs)
         
         
 
-    def runLabExperiment(self):
+    def runLaboratory(self):
         # connect the camera
         self.Camera.connect()
         # initiate the camera

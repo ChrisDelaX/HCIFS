@@ -1,0 +1,14 @@
+{
+  "LabExperiment": false,
+  "Nitr": 30,
+  "cRange": [-8, -3],
+  
+  "planet": true,
+  "lam": 635e-9,
+  "deltaLam": 0,
+  "planetLam": 648e-9,
+  "planetContrast": 1e-9,
+  "planetSeparation": 8
+  
+  }
+}
