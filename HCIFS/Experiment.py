@@ -9,11 +9,6 @@ class Experiment(object):
     
     def __init__(self, JSONfile=None, **specs):
     
-        # default JSON script file
-        if JSONfile is None:
-            JSONfile = 'sampleScript_Lab_FPWC.json'
-        # expand environmental variables
-        JSONfile = os.path.expandvars(JSONfile)
         # asserts given file is a file
         assert os.path.isfile(JSONfile), "%s is not a file."%JSONfile
         

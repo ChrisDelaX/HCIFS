@@ -5,10 +5,15 @@ Quick Start Guide
 -------------------------------
 
 ```ruby
-import HCIFS, HCIFS.Experiment, os.path
-JSONfile = os.path.join(HCIFS.__path__[0],'Scripts','sampleScript_Lab_FPWC.json')
-# create an experiment
-expt = HCIFS.Experiment.Experiment(JSONfile)
+import hcifs, hcifs.experiment, os.path
+from hcifs.experiment import Experiment
+
+# select a JSON file containing your input parameters
+jsonfile = os.path.join(hcifs.__path__[0],'scripts','sampleScript_Lab_FPWC.json')
+
+# create a HCIFS experiment 
+expt = Experiment(jsonfile)
+
 # run a lab experiment
 expt.runLaboratory()
 # run a simulation
