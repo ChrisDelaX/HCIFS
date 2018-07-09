@@ -35,7 +35,6 @@ class Laser:
         Creats an instance of the Laser class. Creates a port attribute to
         hold the connection to the laser.
         """
-        # connects to the laser
         defaults = {
                 'port': 'COM3', 'baudrate': 115200, 'bytesize': 8,
                 'stopbits': 1, 'current': 50, 'channel': 1, 
@@ -43,16 +42,17 @@ class Laser:
                 }
         self.specs = defaults
         self.specs.update(keywords)
+        # connects to the laser
         self.port = s.Serial(port = self.specs['port'], 
                              baudrate = self.specs['baudrate'], 
                              bytesize = self.specs['bytesize'],
                              stopbits = self.specs['stopbits'])
+        self.port.close()
     def enable(self):
         """
         Enables the laser.
         """
-        # closes and then opens the serial port to avoid an error
-        self.port.close()
+        # opens the serial port
         self.port.open()
         # turns the system on by writing to the port
         self.port.write('system=1\r'.encode('utf-8'))
@@ -65,8 +65,7 @@ class Laser:
         """
         Disables the laser.
         """
-        # closes and then opens the serial port to avoid an error
-        self.port.close()
+        # opens the serial port
         self.port.open()
         # turns off the channels and disconnects the laser
         self.port.write('enable=0\r'.encode('utf-8'))
@@ -80,8 +79,7 @@ class Laser:
         """
         Gets the status of the laser and returns it.
         """
-        # closes and then opens the serial port to avoid an error
-        self.port.close()
+        # opens the serial port
         self.port.open()
         # asks the laser's status
         self.port.write('statword?\r'.encode('utf-8'))
@@ -99,8 +97,7 @@ class Laser:
         """
         Chagces the current (in mA) of a specific channel of the laser
         """
-        # closes and then opens the serial port to avoid an error
-        self.port.close()
+        # opens the serial port
         self.port.open()
         
         # sets the max current level
