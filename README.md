@@ -1,2 +1,2 @@
-# HCIL
-High Contrast Imaging Laboratory
+# HCIFS
+High Contrast Integral Field Spectrograph
