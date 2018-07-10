@@ -47,7 +47,7 @@ import numpy as np
 import win32com.client
 import os
 
-class Camera:
+class Camera(object):
     """
     A class that represents the camera connected to the
     computer. It has functions for connecting and disconnecting, changing

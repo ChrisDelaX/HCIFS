@@ -1,26 +1,28 @@
 {
-  "LabExperiment": true,
-  "Nitr": 30,
+  "labExperiment": true,
+  "nbIter": 30,
   "cRange": [-8, -3],
   "planet": false,
   
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
 
-  "hardware": {
+  "hardwareModules": {
     "StarSource": "Thorlabs4channel_1",
-    "PlanetSource": "Thorlabs4channel_2",
+    "PlanetSource": " ",
     "FilterWheel": "FW212b",
-    "OPA1": "custom1500",
+    "OAP1": "Custom1500",
     "FoldMirror": "FM",
     "DM1": "BM1k",
     "DM2": "BM1k",
+    "SP": "Ripple3",
     "SPstage": "APT",
-    "OPA2": "custom1500",
+    "OAP2": "Custom1500",
+    "FPM": "BowTie5_11"
     "FPMstage": "APT",
-    "L1": "lens250",
-    "L2": "lens200",
-    "CCDstage": "APT",
-    "Camera": "QSIrs61"
+    "L1": "Lens250",
+    "L2": "Lens200",
+    "ScienceCamera": "QSIrs61",
+    "SCstage": "APT"
   }
 }

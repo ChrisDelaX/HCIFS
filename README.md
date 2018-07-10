@@ -1,18 +1,23 @@
 # HCIFS
 High Contrast Integral Field Spectrograph
 
+Requirements
+-------------------------------
+The following python packages are required:
+* win32com	--	for Windows only, allows to control the camera
+* json		--	for scriptfiles
+* astropy	--	for units mainly
+
+
 Quick Start Guide
 -------------------------------
 
 ```ruby
-import hcifs, hcifs.experiment, os.path
+import hcifs
 from hcifs.experiment import Experiment
 
-# select a JSON file containing your input parameters
-jsonfile = os.path.join(hcifs.__path__[0],'scripts','sampleScript_Lab_FPWC.json')
-
-# create a HCIFS experiment 
-expt = Experiment(jsonfile)
+# create an HCIFS Experiment 
+expt = Experiment('sampleScript_Lab_FPWC')
 
 # run a lab experiment
 expt.runLaboratory()

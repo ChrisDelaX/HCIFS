@@ -1,7 +1,7 @@
 import serial as s
 import time
 
-class FilterWheel:
+class FilterWheel(object):
     
     def __init__(self, **keywords):
         """
