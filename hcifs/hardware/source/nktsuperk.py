@@ -1,4 +1,4 @@
-from hardware.laser import Laser
+from Hardware.Source import Source
 
-class NKTsuperK(Laser):
+class NKTsuperK(Source):
 	pass
