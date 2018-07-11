@@ -12,9 +12,9 @@ class Thorlabs4channel_1(Laser):
         """
         defaults = {
                 'port': 'COM3', 'baudrate': 115200, 'bytesize': 8,
-                'stopbits': 1, 'current': 50, 'channel': 1, 
+                'stopbits': 1, 'current': 50, 'channel': 3, 
                 'lengthOfCalibrationArea': 10, 'lambda': 635, 'deltalam': 0,
-                'maxCurrent' : 68.09
+                'maxCurrent': 41.59
                 }
         self.specs = defaults
         self.specs.update(keywords)
@@ -48,7 +48,6 @@ class Thorlabs4channel_1(Laser):
         """
         Gets the status of the laser and returns it.
         """
-        super().status()
         
         return self.port.query('statword')
     
