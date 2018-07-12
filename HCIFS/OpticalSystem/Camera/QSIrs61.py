@@ -15,16 +15,16 @@ class QSIrs61(Camera):
         Creates an instance of the Camera class, and initializes the
         default value.
         """
-        super().__init__()
         defaults = {
                 'serialnum': '0', 'shutterStatus': True,'startPos': (0, 0),
                 'imgSize': (500, 500), 'binPix': (4, 4), 'ccdtemp': -15,
-                'name': 'QSICamera.CCDCamera', 'newDarkFrame': True,
-                'darkCam': None, 'binXiL': 4, 'binEta': 4
+                'progID': 'QSICamera.CCDCamera', 'newDarkFrame': True,
+                'darkCam': None, 'binXiL': 4, 'binEta': 4, 'type': 'QSIrs61'
                 }
         self.handle = None
         self.specs = defaults
         self.specs.update(keywords)
+        super().__init__(**keywords)
             
     def connect(self):
         """
@@ -35,7 +35,7 @@ class QSIrs61(Camera):
         try:
             # get a handle of the camera
             if self.handle == None:
-                self.handle = ActiveX(self.specs['name'])
+                self.handle = ActiveX(self.specs['progID'])
             # connect the camera
             if self.handle.query('Connected') == False:
                 print('Connecting camera')
