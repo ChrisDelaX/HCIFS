@@ -6,23 +6,68 @@
   
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
-
-  "hardwareModules": {
-    "StarSource": "Thorlabs4channel_1",
-    "PlanetSource": " ",
-    "FilterWheel": "FW212b",
-    "OAP1": "Custom1500",
-    "FoldMirror": "FM",
-    "DM1": "BM1k",
-    "DM2": "BM1k",
-    "SP": "Ripple3",
-    "SPstage": "APT",
-    "OAP2": "Custom1500",
-    "FPM": "BowTie5_11"
-    "FPMstage": "APT",
-    "L1": "Lens250",
-    "L2": "Lens200",
-    "ScienceCamera": "QSIrs61",
-    "SCstage": "APT"
-  }
+  
+  "sources": [
+    { "name": "Star",
+      "type": "MCLS1",
+      "channel": 1
+    },
+    { "name": "Planet",
+      "type": "MCLS1",
+      "channel": 2
+    }
+  ],
+  
+  "optics": [
+    { "name": "OAP1",
+      "dist2prev": "1500",
+      "focal": 1500
+    },
+    { "name": "FoldMirror",
+      "dist2prev": 300
+    },
+    { "name": "DM1",
+      "type": "BM1k",
+      "dist2prev": 300
+    },
+    { "name": "DM2",
+      "type": "BM1k",
+      "dist2prev": 300,
+      "deadAct": [5, 10]
+    },
+    { "name": "ShapedPupil",
+      "type": "Ripple3",
+      "dist2prev": 300,
+      "position": [0,0],
+      "stageSerial": 1234567,
+      "stageType": "APT"
+    },
+    { "name": "OAP2",
+      "dist2prev": 1200,
+      "focal": 1500
+    },
+    { "name": "FPMask",
+      "type": "BowtieSet",
+      "position": 9,
+      "dist2prev": 1500
+    },
+    { "name": "L1",
+      "dist2prev": 250,
+      "focal": 250
+    },
+    { "name": "L2",
+      "dist2prev": 400,
+      "focal": 200
+    }
+  ],
+  
+  "cameras": [
+    { "name": "FPWC",
+      "type": "QSIrs61",
+      "dist2prev": 200
+    },
+    { "name": "IFS",
+      "type": "SXvrh9"
+    }
+  ]
 }
