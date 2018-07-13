@@ -39,7 +39,7 @@ class QSIrs61(Camera):
             # connect the camera
             if self.handle.query('Connected') == False:
                 print('Connecting camera')
-                self.handle.sets('Connected', True)
+                self.handle.command('Connected', True)
             else:
                 print('Camera is already connected.')
             # get serial number from the camera
@@ -69,22 +69,22 @@ class QSIrs61(Camera):
             raise ValueError('Temperature is not in the correct range.')
         # sets the current camera as the main camera
         if self.handle.query('IsMainCamera') == False:
-            self.handle.sets('IsMainCamera', True)
+            self.handle.command('IsMainCamera', True)
         # turns on the camera fan
         if self.handle.query('FanMode') != 2:
-            self.handle.sets('FanMode', 2)
+            self.handle.command('FanMode', 2)
         # enable the CCD cooler
         if self.handle.query('CoolerOn') != True:
-            self.handle.sets('CoolerOn', True)
+            self.handle.command('CoolerOn', True)
         # set camera cooling temperature and update ccdtemp attribute
         if self.handle.query('CanSetCCDTemperature') == True:
-            self.handle.sets('SetCCDTemperature', ccdtemp)
+            self.handle.command('SetCCDTemperature', ccdtemp)
         # set camera gain to self gain
         if self.handle.query('CameraGain') != 1:
-            self.handle.sets('CameraGain', 1)
+            self.handle.command('CameraGain', 1)
         # set camera shutter priority to electrical
         # 0 for mechanical, 1 for electical
-        self.handle.sets('ShutterPriority', 1)
+        self.handle.command('ShutterPriority', 1)
     
     def shutter(self, openflag):
         """
@@ -94,17 +94,17 @@ class QSIrs61(Camera):
         super().shutter()
         if openflag == True:
             # Set the camera to manual shutter mode.
-            self.handle.sets('ManualShutterMode', True)
+            self.handle.command('ManualShutterMode', True)
             # Open the shutter as specified
-            self.handle.sets('ManualShutterOpen', True)
+            self.handle.command('ManualShutterOpen', True)
             self.specs['shutterStatus'] = True
         elif openflag == False:
             # Set the camera to manual shutter mode
-            self.handle.sets('ManualShutterMode', True)
+            self.handle.command('ManualShutterMode', True)
             # Close the shutter as specified
-            self.handle.sets('ManualShutterOpen', False)
+            self.handle.command('ManualShutterOpen', False)
             # Set the camera to auto shutter mode
-            self.handle.sets('ManualShutterMode', False)
+            self.handle.command('ManualShutterMode', False)
             self.specs['shutterStatus'] = False;
         else:
             raise ValueError('Openflag must be True or False.')
@@ -116,12 +116,12 @@ class QSIrs61(Camera):
         """
         super().exposureproperties(startPos, imgSize, binPix)
         # sends the exposure properties to the camera
-        self.handle.sets('StartX', startPos[0])
-        self.handle.sets('StartY', startPos[1])
-        self.handle.sets('NumX', imgSize[0])
-        self.handle.sets('NumY', imgSize[1])
-        self.handle.sets('BinX', binPix[0])
-        self.handle.sets('BinY', binPix[1])
+        self.handle.command('StartX', startPos[0])
+        self.handle.command('StartY', startPos[1])
+        self.handle.command('NumX', imgSize[0])
+        self.handle.command('NumY', imgSize[1])
+        self.handle.command('BinX', binPix[0])
+        self.handle.command('BinY', binPix[1])
         # update the camera attributes
         self.specs['startPos'] = (self.handle.query('StartX'),
                   self.handle.query('StartY'))
@@ -136,7 +136,8 @@ class QSIrs61(Camera):
         """
         super().exposure()
         # Starts an exposure on the camera
-        self.handle.command('StartExposure', expTime, self.specs['shutterStatus'])
+        StartExposure = self.handle.query('StartExposure')
+        StartExposure(expTime, self.specs['shutterStatus'])
         # Wait for the exposure to complete
         done = self.handle.query('ImageReady')
         while done != True:
@@ -153,7 +154,7 @@ class QSIrs61(Camera):
         """
         super().readoutspeed()
         # sends the readout speed to the camera
-        self.handle.sets('ReadoutSpeed', readoutflag)
+        self.handle.command('ReadoutSpeed', readoutflag)
         
     def shutterpriority(self, shutterflag):
         """
@@ -162,7 +163,7 @@ class QSIrs61(Camera):
         """
         super().shutterpriority()
         # sends the shutter pririty to the camera
-        self.handle.sets('ShutterPriority', shutterflag)
+        self.handle.command('ShutterPriority', shutterflag)
     
     def finalize(self):
         """
@@ -172,10 +173,10 @@ class QSIrs61(Camera):
         super().finalize()
         # turn off the camera fan
         if self.handle.query('FanMode') != 0:
-            self.handle.sets('FanMode', 0)
+            self.handle.command('FanMode', 0)
         # disable the CCD cooler
         if self.handle.query('CoolerOn') != False:
-            self.handle.sets('CoolerOn', False)        
+            self.handle.command('CoolerOn', False)        
         
     def disable(self):
         """
@@ -184,4 +185,4 @@ class QSIrs61(Camera):
         super().disable()
         # disconnects camera
         if self.handle.query('Connected') == True:
-            self.handle.sets('Connected', False)
+            self.handle.command('Connected', False)
