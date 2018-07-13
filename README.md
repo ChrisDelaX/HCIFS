@@ -4,9 +4,11 @@ High Contrast Integral Field Spectrograph
 Requirements
 -------------------------------
 The following python packages are required:
-* ``win32com``	--	for Windows only, allows to control the camera
-* ``json``		--	for scriptfiles
-* ``astropy``	--	for units mainly
+* ``json`` ------- format used for scriptfiles
+* ``astropy`` ---- allows using units and quantities
+* ``win32com`` --- allows to control the camera (works on Windows only)
+* ``serial`` ----- allows controlling the laser and filter wheel
+* ``PyAPT`` ------ allows controlling the motorized stages (also requires ``APT.dll`` and ``APT.lib`` from ``https://github.com/mcleu/PyAPT/tree/master/APTDLLPack/DLL``
 
 
 Quick Start Guide
