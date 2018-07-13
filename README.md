@@ -6,10 +6,12 @@ Requirements
 The following python packages are required:
 * ``json`` ------- format used for scriptfiles
 * ``astropy`` ---- allows using units and quantities
+
+To run a laboratory experiment, also install:
 * ``win32com`` --- allows to control the camera (works on Windows only)
 * ``serial`` ----- allows controlling the laser and filter wheel
 * ``PyAPT`` ------ allows controlling the motorized stages (also requires ``APT.dll`` and ``APT.lib`` from ``https://github.com/mcleu/PyAPT/tree/master/APTDLLPack/DLL``
-
+* ``bmc`` -------- allows controlling the DMs (courtesy of Boston Micromachines Corporation)
 
 Quick Start Guide
 -------------------------------
