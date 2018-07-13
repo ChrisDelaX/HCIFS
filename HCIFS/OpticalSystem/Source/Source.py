@@ -1,24 +1,25 @@
 class Source(object):
     
-    def __init__(self):
+    def __init__(self, **specs):
         """
-        Creats an instance of the Source class. Creates a port attribute to
+        Creates an instance of the Source class. Creates a port attribute to
         hold the connection to the laser.
         """
         self.specs = {}
         self.port = None
+    
     def enable(self):
         """
         Enables the source.
         """
         pass
-        
+    
     def disable(self):
         """
         Disables the source.
         """
         pass
-        
+    
     def status(self):
         """
         Gets the status of the source and returns it.

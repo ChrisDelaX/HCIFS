@@ -24,15 +24,15 @@
 #       # length = 10 seems to work. camera is the an isntance of Camera class
 
 import time
-from ImageProcessing import fit_gauss_2D
 import numpy as np
-from OpticalSystem.Control import SerialPort
-from OpticalSystem.Source.Source import Source
+from HCIFS.OpticalSystem.Source.Source import Source
+from HCIFS.Utils.LabControl import SerialPort
+from HCIFS.Utils.ImageProcessing import fit_gauss_2D
 
 class MCLS1(Source):
     def __init__(self, **keywords):
         """
-        Creats an instance of the MCLS1 class. Creates a port attribute to
+        Creates an instance of the MCLS1 class. Creates a port attribute to
         hold the connection to the laser.
         """
         defaults = {
@@ -50,11 +50,11 @@ class MCLS1(Source):
                                stopBits = self.specs.get('stopbits'))
         if self.specs.get('channel') == 1:
             self.specs['maxCurrent'] = 68.09
-        else if self.specs.get('channel') == 2:
+        elif self.specs.get('channel') == 2:
             self.specs['maxCurrent'] = 63.89
-        else if self.specs.get('channel') == 3:
+        elif self.specs.get('channel') == 3:
             self.specs['maxCurrent'] == 41.59
-        else if self.specs.get('channel') == 4:
+        elif self.specs.get('channel') == 4:
             self.specs['maxCurrent'] = 67.39
                 
     def enable(self):

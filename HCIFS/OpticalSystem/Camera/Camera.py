@@ -3,7 +3,7 @@ import numpy as np
 import os
 import importlib
 
-class Camera:
+class Cameras(object):
     """
     A class that represents the camera connected to the
     computer. It has functions for connecting and disconnecting, changing

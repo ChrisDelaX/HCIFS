@@ -2,12 +2,12 @@
 #from Hardware.Laser import Laser
 #from Hardware.Motor import Motor
 import os.path, json, inspect
-
+from HCIFS.OpticalSystem.OpticalSystem import OpticalSystem
 
 
 class Experiment(object):
     
-    def __init__(self, jsonfile=None, labExperiment=False, nbIter=30, **specs):
+    def __init__(self, jsonfile=None, nbIter=30, **specs):
     
         # ensure JSON filename extension
         if jsonfile[-5:].lower() != '.json':
@@ -23,35 +23,12 @@ class Experiment(object):
             self.specs.update(specs)
         except IOError:
             raise IOError("'%s' is not a file."%jsonfile)
-        except ValueError as error:
-            print("Error: script file is formatted incorrectly.")
-            raise ValueError(error)
+        except ValueError:
+            raise ValueError("Error: script file is formatted incorrectly.")
         
-        # initialize hardware
-#         self.labExperiment = bool(labExperiment)
-#         if self.labExperiment is True:
-#             labComposition = StarSource": "Thorlabs4channel_1",
-#     "PlanetSource": "Thorlabs4channel_2",
-#     "FilterWheel": "FW212b",
-#     "OAP1": "Custom1500",
-#     "FoldMirror": "FM",
-#     "DM1": "BM1k",
-#     "DM2": "BM1k",
-#     "SP": "Ripple3",
-#     "SPstage": "APT",
-#     "OAP2": "Custom1500",
-#     "FPM": "BowTie5_11"
-#     "FPMstage": "APT",
-#     "L1": "Lens250",
-#     "L2": "Lens200",
-#     "ScienceCamera": "QSIrs61",
-#     "SCstage": "APT"
-
-
-#        self.Camera = Camera(**self.specs)
-#        self.Laser = Laser(**self.specs)
-#        self.HorizontalMotor = Motor("h", **specs)
-#        self.VeritcalMotor = Motor("v", **specs)
+        # initialize the Optical System
+        self.OpticalSystem = OpticalSystem(**self.specs)
+        
         
         
 

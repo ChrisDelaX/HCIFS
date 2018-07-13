@@ -5,7 +5,7 @@ import win32com.client
 from PyAPT.PyAPT import APTMotor
 import time
 
-class Control():
+class LabControl():
     
     def __init__(self):
         self.connection = None
@@ -24,7 +24,7 @@ class Control():
         request = getattr(self.connection, attribute)
         request(*value)
 
-class PyAPT(Control):
+class PyAPT(LabControl):
     
     def __init__(self, serial_number, device_type):
         super().__init__()
@@ -33,7 +33,7 @@ class PyAPT(Control):
     def query(self, attribute):
         return super().query(attribute)()
 
-class ActiveX(Control):
+class ActiveX(LabControl):
     
     def __init__(self, name):
         """
@@ -45,7 +45,7 @@ class ActiveX(Control):
     def sets(self, attribute, value):
         setattr(self.connection, attribute, value)
 
-class SerialPort(Control):
+class SerialPort(LabControl):
     
     def __init__(self, comPort, baudRate = 115200, byteSize = 8, stopBits = 1):
         """

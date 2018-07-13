@@ -7,10 +7,11 @@
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
   
-  "sources": [
+  "Source": [
     { "name": "Star",
       "type": "MCLS1",
-      "channel": 1
+      "channel": 1,
+      "dist2next": 1500
     },
     { "name": "Planet",
       "type": "MCLS1",
@@ -18,56 +19,54 @@
     }
   ],
   
-  "optics": [
+  "Optics": [
     { "name": "OAP1",
-      "dist2prev": "1500",
+      "dist2next": 300,
       "focal": 1500
     },
     { "name": "FoldMirror",
-      "dist2prev": 300
+      "dist2next": 300
     },
     { "name": "DM1",
       "type": "BM1k",
-      "dist2prev": 300
+      "dist2next": 300
     },
     { "name": "DM2",
       "type": "BM1k",
-      "dist2prev": 300,
+      "dist2next": 300,
       "deadAct": [5, 10]
     },
     { "name": "ShapedPupil",
       "type": "Ripple3",
-      "dist2prev": 300,
-      "position": [0,0],
-      "stageSerial": 1234567,
-      "stageType": "APT"
+      "dist2next": 1200
     },
     { "name": "OAP2",
-      "dist2prev": 1200,
+      "dist2next": 1500,
       "focal": 1500
     },
     { "name": "FPMask",
       "type": "BowtieSet",
       "position": 9,
-      "dist2prev": 1500
+      "dist2next": 250,
+      "stageType": ["MTS50", "MTS50", null],
+      "stageSerial": [1234567, 456789, null]
     },
     { "name": "L1",
-      "dist2prev": 250,
+      "dist2next": 400,
       "focal": 250
     },
     { "name": "L2",
-      "dist2prev": 400,
+      "dist2next": 200,
       "focal": 200
     }
   ],
   
-  "cameras": [
+  "Camera": [
     { "name": "FPWC",
       "type": "QSIrs61",
-      "dist2prev": 200
-    },
-    { "name": "IFS",
-      "type": "SXvrh9"
+      "dist2prev": 200,
+      "stageType": [null, null, "LTS300"],
+      "stageSerial": [null, null, 3456789]
     }
   ]
 }
