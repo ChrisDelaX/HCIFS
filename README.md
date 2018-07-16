@@ -10,7 +10,7 @@ Using the free and open source Anaconda Python Distribution is recommended. It a
 To run a laboratory experiment, the following python packages must be installed:
 * ``win32com`` --- allows to control the camera (works on Windows only)
 * ``serial`` ----- allows controlling the laser and filter wheel
-* ``PyAPT`` ------ allows controlling the motorized stages (also requires ``APT.dll`` and ``APT.lib`` from ``https://github.com/mcleu/PyAPT/tree/master/APTDLLPack/DLL``
+* ``PyAPT`` ------ allows controlling the motorized stages (also requires ``APT.dll`` and ``APT.lib`` from https://github.com/mcleu/PyAPT/tree/master/APTDLLPack/DLL
 * ``bmc`` -------- allows controlling the DMs (courtesy of Boston Micromachines Corporation)
 
 Quick Start Guide

@@ -1,8 +1,5 @@
 # uses michael leung's pyapt module for controlling thorlabs apt motors
 # https://github.com/mcleu/PyAPT
-import serial
-import win32com.client
-from PyAPT.PyAPT import APTMotor
 import time
 
 class LabControl():
@@ -28,8 +25,12 @@ class PyAPT(LabControl):
     
     def __init__(self, serial_number, device_type):
         super().__init__()
-        self.connection = APTMotor(SerialNum = serial_number,
-                                   HWTYPE = device_type)
+        try:
+            from PyAPT.PyAPT import APTMotor
+            self.connection = APTMotor(SerialNum=serial_number, HWTYPE=device_type)
+        except ModuleNotFoundError:
+            print("'PyAPT' package is missing. Can't use APT LabControl.")
+    
     def query(self, attribute):
         return super().query(attribute)()
 
@@ -40,24 +41,30 @@ class ActiveX(LabControl):
         initiates an activex connection using win32com
         """
         super().__init__()
-        self.connection = win32com.client.Dispatch(name)
+        try:
+            import win32com.client
+            self.connection = win32com.client.Dispatch(name)
+        except ModuleNotFoundError:
+            print("'win32com' package is missing. Can't use ActiveX LabControl.")
         
-    def sets(self, attribute, value):
+    def command(self, attribute, value):
         setattr(self.connection, attribute, value)
 
 class SerialPort(LabControl):
     
-    def __init__(self, comPort, baudRate = 115200, byteSize = 8, stopBits = 1):
+    def __init__(self, comPort, baudRate=115200, byteSize=8, stopBits=1):
         """
         initializes a serial port connection and then closes it with the
         defaults or keyword arguments
         """
         super().__init__()
-        self.connection = serial.Serial(port = comPort, baudrate = baudRate,
-                                        bytesize = byteSize, 
-                                        stopbits = stopBits)
-        self.connection.close()
-        
+        try:
+            import serial
+            self.connection = serial.Serial(port=comPort, baudrate=baudRate,
+                    bytesize=byteSize, stopbits=stopBits)
+            self.connection.close()
+        except ModuleNotFoundError:
+            print("'serial' package is missing. Can't use SerialPort LabControl.")
     
     def query(self, attribute):
         """

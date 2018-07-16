@@ -17,7 +17,6 @@ class Optics():
             importlib.import_module(importName)
             stageClass = getattr(importName, moduleName)
             self.stage = stageClass(self.specs['stageSerial'])
-            
     
     def position(self):
         if self.specs.get('stageType') != None:

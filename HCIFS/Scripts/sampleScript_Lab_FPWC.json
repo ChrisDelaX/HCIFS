@@ -7,11 +7,10 @@
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
   
-  "Source": [
+  "Sources": [
     { "name": "Star",
       "type": "MCLS1",
-      "channel": 1,
-      "dist2next": 1500
+      "channel": 1
     },
     { "name": "Planet",
       "type": "MCLS1",
@@ -29,10 +28,12 @@
     },
     { "name": "DM1",
       "type": "BM1k",
+      "DMserial": "3456789",
       "dist2next": 300
     },
     { "name": "DM2",
       "type": "BM1k",
+      "DMserial": "1234567",
       "dist2next": 300,
       "deadAct": [5, 10]
     },
@@ -61,10 +62,9 @@
     }
   ],
   
-  "Camera": [
+  "Cameras": [
     { "name": "FPWC",
       "type": "QSIrs61",
-      "dist2prev": 200,
       "stageType": [null, null, "LTS300"],
       "stageSerial": [null, null, 3456789]
     }

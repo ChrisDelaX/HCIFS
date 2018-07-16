@@ -1,37 +1,42 @@
-class Source(object):
+class Sources(object):
     
-    def __init__(self, **specs):
+    def __init__(self, labExperiment=False, **specs):
         """
-        Creates an instance of the Source class. Creates a port attribute to
+        Creates an instance of the Sources class. Creates a port attribute to
         hold the connection to the laser.
         """
-        self.specs = {}
-        self.port = None
+        
+        # get the laboratory experiment flag
+        self.labExperiment = bool(specs.get('labExperiment', labExperiment))
     
     def enable(self):
         """
         Enables the source.
         """
-        pass
+        assert labExperiment is False, "Can't 'enable' the default 'Sources' module."
+        print("Turn 'labExperiment = True' to run the lab.")
     
     def disable(self):
         """
         Disables the source.
         """
-        pass
+        assert labExperiment is False, "Can't 'disable' the default 'Sources' module."
+        print("Turn 'labExperiment = True' to run the lab.")
     
     def status(self):
         """
         Gets the status of the source and returns it.
         """
-        status = "status"
-        return status
+        assert labExperiment is False, "Can't use 'status' with default 'Sources' module."
+        print("Turn 'labExperiment = True' to run the lab.")
+        return 'no status'
     
     def changeCurrent(self, current):
         """
         Changes the current (in mA) of a specific channel of the source
         """
-        pass
+        assert labExperiment is False, "Can't 'change current' with default 'Sources' module."
+        print("Turn 'labExperiment = True' to run the lab.")
     
     def calibrate(self, camera):
         """

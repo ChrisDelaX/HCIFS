@@ -25,37 +25,35 @@
 
 import time
 import numpy as np
-from HCIFS.OpticalSystem.Source.Source import Source
-from HCIFS.Utils.LabControl import SerialPort
+from HCIFS.OpticalSystem.Sources.Sources import Sources
 from HCIFS.Utils.ImageProcessing import fit_gauss_2D
 
-class MCLS1(Source):
-    def __init__(self, **keywords):
+
+class MCLS1(Sources):
+    def __init__(self, port='COM3', current=0, npixCalib=10, channel=1, **specs):
         """
         Creates an instance of the MCLS1 class. Creates a port attribute to
         hold the connection to the laser.
         """
-        defaults = {
-                'port': 'COM3', 'baudrate': 115200, 'bytesize': 8,
-                'stopbits': 1, 'current': 50, 'channel': 1, 
-                'lengthOfCalibrationArea': 10, 'lambda': 635, 'deltalam': 0,
-                'maxCurrent' : 41.59
-                }
-        self.specs = defaults
-        self.specs.update(keywords)
+        
+        # call the Source constructor
+        super().__init__(**specs)
+        
+        # load laser attribute values
+        self.port = str(specs.get('port', port))                # the port
+        self.current = float(specs.get('current', current))     # source current
+        self.npixCalib = int(specs.get('npixCalib', npixCalib)) # length of calibration area
+        
+        # load channel specific attribute values
+        self.channel = int(specs.get('channel', channel))       # selected channel (1-4)
+        maxCurrent = {1: 68.09, 2: 63.89, 3: 41.59, 4: 67.39}
+        self.maxCurrent = maxCurrent[self.channel]              # max current allowed
+        
         # connects to the laser
-        self.port = SerialPort(comPort = self.specs.get('port'),
-                               baudRate = self.specs.get('baudrate'),
-                               byteSize = self.specs.get('bytesize'),
-                               stopBits = self.specs.get('stopbits'))
-        if self.specs.get('channel') == 1:
-            self.specs['maxCurrent'] = 68.09
-        elif self.specs.get('channel') == 2:
-            self.specs['maxCurrent'] = 63.89
-        elif self.specs.get('channel') == 3:
-            self.specs['maxCurrent'] == 41.59
-        elif self.specs.get('channel') == 4:
-            self.specs['maxCurrent'] = 67.39
+        if self.labExperiment is True:
+            from HCIFS.Utils.LabControl import SerialPort
+            self.port = SerialPort(comPort=self.port, baudRate=self.baudrate, 
+                    byteSize=self.bytesize, stopBits=self.stopbits)
                 
     def enable(self):
         """
@@ -124,7 +122,7 @@ class MCLS1(Source):
         with the x and y coordinates and the intensity for first the central
         peak and then the secondary one
         """
-        length = self.specs['lengthOfCalibrationArea']
+        length = self.specs['npixCalib']
         SATURATION =30900
         # sets the current to a low setting for first image
         self.changeCurrent(10, self.specs['channel'])

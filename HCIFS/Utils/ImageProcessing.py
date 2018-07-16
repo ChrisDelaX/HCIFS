@@ -4,10 +4,10 @@ import scipy.special as spe
 import matplotlib.pyplot as plt
 from matplotlib import cm           # palette for image display
 
-def twoD_Gaussian((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
+def twoD_Gaussian(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
     ''' Model function. 2D Gaussian.
     '''    
-    
+    x, y = xy
     xo = float(xo)
     yo = float(yo)
     a = (np.cos(theta)**2)/(2*sigma_x**2) + (np.sin(theta)**2)/(2*sigma_y**2)
@@ -45,10 +45,11 @@ def poly6odd(x, x0, a0, a2, a4, a6):
     y = a0 + a2*xx**2 + a4*xx**4 + a6*xx**6
     return y
 
-def twoD_Airy((x,y), amplitude, xo, yo, F):
+def twoD_Airy(xy, amplitude, xo, yo, F):
     ''' Model function. 2D Airy.
     '''    
 
+    (x, y) = xy
     r = np.sqrt((x-xo)**2+(y-yo)**2)*F
     
     nx=r.shape[1]
@@ -59,7 +60,7 @@ def twoD_Airy((x,y), amplitude, xo, yo, F):
         indmax=np.unravel_index(maxmap.argmax(), maxmap.shape)
         r[indmax]=1.
     elif nbmax > 1:
-        print 'ERROR in twoD_Airy: several nulls'
+        print('ERROR in twoD_Airy: several nulls')
     
     J=spe.jn(1, r)
     Airy=amplitude*(2*J/r)**2
@@ -81,7 +82,7 @@ def oneD_Airy(x, amplitude, xo, F):
         indmax=np.argmax(maxmap)
         r[indmax]=1.
     elif nbmax > 1:
-        print 'ERROR in oneD_Airy: several nulls'
+        print('ERROR in oneD_Airy: several nulls')
     
     J=spe.jn(1, r)
     Airy=amplitude*(2*J/r)**2
@@ -103,7 +104,7 @@ def oneD_Airy_log(x, amplitude, xo, F):
         indmax=np.argmax(maxmap)
         r[indmax]=1.
     elif nbmax > 1:
-        print 'ERROR in oneD_Airy: several nulls'
+        print('ERROR in oneD_Airy: several nulls')
     
     J=spe.jn(1, r)
     Airy=amplitude*(2*J/r)**2
@@ -117,7 +118,7 @@ def fit_gauss_2D(img):
         
         Returns the best fit parameters of the Gaussian shape.
         
-        See twoD_Gaussian((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset)
+        See twoD_Gaussian(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset)
     '''
 
     nx=img.shape[1]
@@ -125,11 +126,12 @@ def fit_gauss_2D(img):
     x = np.linspace(0, nx-1, nx)
     y = np.linspace(0, ny-1, ny)
     x, y = np.meshgrid(x, y)
+    xy = (x, y)
 
     init_xmax=np.unravel_index(img.argmax(), img.shape)[1]
     init_ymax=np.unravel_index(img.argmax(), img.shape)[0]
     initial_guess = (img.max(), init_xmax, init_ymax, 5, 5, 0, 0)
-    popt, pcov = opt.curve_fit(twoD_Gaussian, (x, y), img.ravel(), 
+    popt, pcov = opt.curve_fit(twoD_Gaussian, xy, img.ravel(), 
                                p0=initial_guess)
     
     return popt
@@ -157,7 +159,7 @@ def fit_airy_2D(img, disp=0):
         
         Returns the best fit parameters of the Airy pattern.
         
-        See twoD_Airy((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset)
+        See twoD_Airy(xy, amplitude, xo, yo, sigma_x, sigma_y, theta, offset)
     '''
 
     nx=img.shape[1]
@@ -165,19 +167,20 @@ def fit_airy_2D(img, disp=0):
     x = np.linspace(0, nx-1, nx)
     y = np.linspace(0, ny-1, ny)
     x, y = np.meshgrid(x, y)
-
+    xy = (x, y)
+    
     init_xmax=np.unravel_index(img.argmax(), img.shape)[1]
     init_ymax=np.unravel_index(img.argmax(), img.shape)[0]
     initial_guess = (img.max(), init_xmax, init_ymax, .4)
     #initial_guess = (img[init_xmax, init_ymax]  , init_xmax, init_ymax, .6)
 
     #plt.figure(27)
-    #plt.imshow(twoD_Airy((x,y), img[init_xmax, init_ymax]  , init_xmax, init_ymax, .6).reshape(nx,ny))
+    #plt.imshow(twoD_Airy(xy, img[init_xmax, init_ymax]  , init_xmax, init_ymax, .6).reshape(nx,ny))
 
-    popt, pcov = opt.curve_fit(twoD_Airy, (x, y), img.ravel(), p0=initial_guess)
+    popt, pcov = opt.curve_fit(twoD_Airy, xy, img.ravel(), p0=initial_guess)
     
     if disp != 0:
-        data_fitted = twoD_Airy((x, y), *popt)
+        data_fitted = twoD_Airy(xy, *popt)
         #offset=np.min(img)
         plt.figure(disp)
         plt.clf()
@@ -205,11 +208,11 @@ def fit_airy_2D(img, disp=0):
         plt.plot(P_fit, 'r--')
         plt.yscale('log')
         
-        print '\n--- Airy disk fit results ---'
-        print 'Amplitude ='+str(popt[0])
-        print 'Position of the maximum: \nxo='+str(popt[1])+' nyo='+str(popt[2])
-        print 'F factor='+str(popt[3])
-        print '-----------------------------'
+        print('\n--- Airy disk fit results ---')
+        print('Amplitude ='+str(popt[0]))
+        print('Position of the maximum: \nxo='+str(popt[1])+' nyo='+str(popt[2]))
+        print('F factor='+str(popt[3]))
+        print('-----------------------------')
     
     return popt
     
@@ -277,13 +280,13 @@ def get_r_dist(nx,ny,xo,yo):
     
     return np.sqrt(x**2+y**2)
     
-def get_radial_profile(img, (xo,yo), nbin, disp=0):
+def get_radial_profile(img, xoyo, nbin, disp=0):
     ''' Computes the mean radial profile of the image.
     
         img:
             2D image.
-        (xo,yo):
-            center for the annuli.
+        xoyo:
+            (xo,yo) center for the annuli.
         nbin:
             width of the annuli in pixels
         disp:
@@ -291,8 +294,9 @@ def get_radial_profile(img, (xo,yo), nbin, disp=0):
             Its value will serve as the window number that will be created.
     '''
     
-    (nx,ny)=img.shape
-    r=get_r_dist(nx,ny,xo,yo)    
+    (xo, yo) = xoyo
+    (nx, ny) = img.shape
+    r = get_r_dist(nx, ny, xo, yo)
     
     r_max = np.max(r) # radius of the image
     r_max = np.max(r[xo,:])
@@ -363,9 +367,9 @@ def adjust_bckgr_level(img, xo, yo, R=0, disp=0):
     bckgr_mean=np.mean(M)
     
     
-    print '\n----- Checking background level ------'
-    print 'Background level = '+str(bckgr_med)+' [median]'
-    print '                   '+str(bckgr_mean)+' [mean]'
+    print('\n----- Checking background level ------')
+    print('Background level = '+str(bckgr_med)+' [median]')
+    print('                   '+str(bckgr_mean)+' [mean]')
     
     if disp != 0:
         plt.figure(disp)
@@ -377,8 +381,8 @@ def adjust_bckgr_level(img, xo, yo, R=0, disp=0):
     
     if bckgr_med != 0 :
         img=img-bckgr_med
-        print ' -> background adjusted to 0 median'
+        print(' -> background adjusted to 0 median')
     
-    print '------------------------------------- '
+    print('------------------------------------- ')
         
     return (img, bckgr_med, bckgr_mean)

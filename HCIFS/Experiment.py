@@ -37,7 +37,7 @@ class Experiment(object):
         # win32com package must be installed to run the lab (Windows platform only)
         try:
             import win32com.client
-        except ImportError, e:
+        except ImportError:
             raise ImportError("Can't control the camera without win32com package.")
 
         # connect the camera
