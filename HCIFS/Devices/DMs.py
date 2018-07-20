@@ -1,8 +1,9 @@
-from OpticalSystem.Optics.Optics import Optics
+from HCIFS.Devices import DM
 
-class Ripple3(Optics):
+class BM1k(DM):
     def __init__(self, **keywords):
-        defaults = {'type': 'Ripple3'}
+        defaults = {'type': 'BM1k'}
+        self.specs = keywords
         self.specs.update(defaults)
         self.specs.update(keywords)
         super().__init__(**self.specs)

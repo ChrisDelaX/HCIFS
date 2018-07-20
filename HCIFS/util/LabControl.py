@@ -29,7 +29,9 @@ class PyAPT(LabControl):
             from PyAPT.PyAPT import APTMotor
             self.connection = APTMotor(SerialNum=serial_number, HWTYPE=device_type)
         except ModuleNotFoundError:
-            print("'PyAPT' package is missing. Can't use APT LabControl.")
+            raise ModuleNotFoundError("'PyAPT' package is missing. " \
+                    + "Can't use APT LabControl. To run a simulation, " \
+                    + "make sure 'labExperiment = False'.")
     
     def query(self, attribute):
         return super().query(attribute)()
@@ -45,7 +47,9 @@ class ActiveX(LabControl):
             import win32com.client
             self.connection = win32com.client.Dispatch(name)
         except ModuleNotFoundError:
-            print("'win32com' package is missing. Can't use ActiveX LabControl.")
+            raise ModuleNotFoundError("'win32com' package is missing. " \
+                    + "Can't use ActiveX LabControl. To run a simulation, " \
+                    + "make sure 'labExperiment = False'.")
         
     def command(self, attribute, value):
         setattr(self.connection, attribute, value)
@@ -64,7 +68,9 @@ class SerialPort(LabControl):
                     bytesize=byteSize, stopbits=stopBits)
             self.connection.close()
         except ModuleNotFoundError:
-            print("'serial' package is missing. Can't use SerialPort LabControl.")
+            raise ModuleNotFoundError("'serial' package is missing. " \
+                    + "Can't use SerialPort LabControl. To run a simulation, " \
+                    + "make sure 'labExperiment = False'.")
     
     def query(self, attribute):
         """

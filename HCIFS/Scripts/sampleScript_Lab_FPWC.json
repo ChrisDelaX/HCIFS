@@ -1,5 +1,5 @@
 {
-  "labExperiment": true,
+  "labExperiment": false,
   "nbIter": 30,
   "cRange": [-8, -3],
   "planet": false,
@@ -7,7 +7,15 @@
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
   
-  "Sources": [
+  "loops": [
+    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L2", "FPWC"],
+    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L3", "IFS"]
+    ],
+  "distances": [
+    [1500, 600, 300, 600, 1000, 1500, 250, 300, 200],
+    [1500, 600, 300, 600, 1000, 1500, 250, 500, 700]
+    ],  
+  "Devices": [
     { "name": "Star",
       "type": "MCLS1",
       "channel": 1
@@ -15,58 +23,48 @@
     { "name": "Planet",
       "type": "MCLS1",
       "channel": 2
-    }
-  ],
-  
-  "Optics": [
-    { "name": "OAP1",
-      "dist2next": 300,
-      "focal": 1500
     },
-    { "name": "FoldMirror",
-      "dist2next": 300
+    { "name": "Simu",
+      "type": "Source",
+      "lam": 800
+    },
+    { "name": "OAP1",
+      "focal": 1500
     },
     { "name": "DM1",
       "type": "BM1k",
-      "DMserial": "3456789",
-      "dist2next": 300
+      "DMserial": "25CW004#014"
     },
     { "name": "DM2",
       "type": "BM1k",
-      "DMserial": "1234567",
-      "dist2next": 300,
+      "DMserial": "25CW018#040",
       "deadAct": [5, 10]
     },
-    { "name": "ShapedPupil",
-      "type": "Ripple3",
-      "dist2next": 1200
+    { "name": "SP",
+      "type": "Ripple3"
     },
     { "name": "OAP2",
-      "dist2next": 1500,
       "focal": 1500
     },
-    { "name": "FPMask",
+    { "name": "FPM",
       "type": "BowtieSet",
-      "position": 9,
-      "dist2next": 250,
-      "stageType": ["MTS50", "MTS50", null],
-      "stageSerial": [1234567, 456789, null]
+      "stageTypes": ["MTS50", "MTS50", null],
+      "stageSerials": [83815646, 83815669, null],
+      "FPMchoice": 9
     },
     { "name": "L1",
-      "dist2next": 400,
       "focal": 250
     },
     { "name": "L2",
-      "dist2next": 200,
       "focal": 200
-    }
-  ],
-  
-  "Cameras": [
+    },
     { "name": "FPWC",
       "type": "QSIrs61",
-      "stageType": [null, null, "LTS300"],
-      "stageSerial": [null, null, 3456789]
+      "stageTypes": [null, null, "LTS300"],
+      "stageSerials": [null, null, "45862339"]
+    },
+    { "name": "IFS",
+      "type": "SXvrh9"
     }
   ]
 }

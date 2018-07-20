@@ -2,8 +2,8 @@ def createStage(device):
     stage = []
     for i in range(3):
         if device.stageType[i] == None:
-            import OpticalSystem.MotorStage.Stage.Stage as Stage
-            stage.append(Stage())
+            import HCIFS.OpticalSystem.Stages.Stages as Stages
+            stage.append(Stages())
         else:
             moduleName = device.stageType[i]
             importName = 'OpticalSystem.MotorStage.' + moduleName
@@ -13,7 +13,7 @@ def createStage(device):
     return stage
 
 def getPos(self, name):
-    for i in range(len(self.optics)):
+    for i in range(len(self.Optics)):
         if name == self.optics[i].name:
             ID = i
     device = self.optics[ID]   

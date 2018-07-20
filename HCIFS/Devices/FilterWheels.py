@@ -1,5 +1,5 @@
-from OpticalSystem.FilterWheel.FilterWheel import FilterWheel
-from OpticalSystem.Control import SerialPort
+from HCIFS.Devices import FilterWheel
+from HCIFS.util.LabControl import SerialPort
 
 class FW212b(FilterWheel):
      

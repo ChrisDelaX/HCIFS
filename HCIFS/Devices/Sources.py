@@ -23,97 +23,102 @@
 #       # length defines the size of the area that is searched for a guassian
 #       # length = 10 seems to work. camera is the an isntance of Camera class
 
+from HCIFS.Devices import Source
+from HCIFS.util.img_processing import fit_gauss_2D
 import time
 import numpy as np
-from HCIFS.OpticalSystem.Sources.Sources import Sources
-from HCIFS.Utils.ImageProcessing import fit_gauss_2D
+import astropy.units as u
 
+class NKTsuperK(Source):
+    pass
 
-class MCLS1(Sources):
-    def __init__(self, port='COM3', current=0, npixCalib=10, channel=1, **specs):
+class MCLS1(Source):
+    def __init__(self, port='COM3', current=0, channel=1, **specs):
         """
         Creates an instance of the MCLS1 class. Creates a port attribute to
         hold the connection to the laser.
         """
-        
-        # call the Source constructor
+        # call the Sources constructor
         super().__init__(**specs)
         
         # load laser attribute values
         self.port = str(specs.get('port', port))                # the port
         self.current = float(specs.get('current', current))     # source current
-        self.npixCalib = int(specs.get('npixCalib', npixCalib)) # length of calibration area
-        
-        # load channel specific attribute values
         self.channel = int(specs.get('channel', channel))       # selected channel (1-4)
         maxCurrent = {1: 68.09, 2: 63.89, 3: 41.59, 4: 67.39}
         self.maxCurrent = maxCurrent[self.channel]              # max current allowed
+        lam =  {1: 635, 2: 658, 3: 670, 4: 705}
+        self.lam = lam[self.channel]*u.nm                       # wavelength in nm
         
         # connects to the laser
         if self.labExperiment is True:
             from HCIFS.Utils.LabControl import SerialPort
-            self.port = SerialPort(comPort=self.port, baudRate=self.baudrate, 
-                    byteSize=self.bytesize, stopBits=self.stopbits)
-                
+            self.port = SerialPort(comPort=self.port)
+        
     def enable(self):
         """
         Enables the MCLS1.
         """
-        super().enable()
-        # turns the system on by writing to the port
-        self.port.command('system', 1)
-        print('Laser is now enabled')
-        # closes the port
-        time.sleep(3)
+        if not self.labExperiment:
+            super().enable()
+        else:
+            # turns the system on by writing to the port
+            self.port.command('system', 1)
+            print('Laser is now enabled')
+            # closes the port
+            time.sleep(3)
         
     def disable(self):
         """
         Disables the laser.
         """
-        super().disable()
-        self.port.command('enable', 0)
-        self.port.command('system', 0)
-        print('Laser is now disabled')
-        time.sleep(3)
+        if not self.labExperiment:
+            super().disable()
+        else:
+            self.port.command('enable', 0)
+            self.port.command('system', 0)
+            print('Laser is now disabled')
+            time.sleep(3)
         
     def status(self):
         """
         Gets the status of the MCLS1 and returns it.
         """
-        super().status()
-        
-        return self.port.query('statword')
+        if not self.labExperiment:
+            super().status()
+        else:
+            return self.port.query('statword')
     
     def changeCurrent(self, current):
         """
         Changes the current (in mA) of a specific channel of the MCLS1
         """
-        super().changeCurrent(current)
-        # sets the max current level
-        maxCurrent = self.specs['maxCurrent']
-        channel = self.specs['channel']
-        # checks to make sure the new current is below the max current and 
-        # then sets the new current on the correct channel
-        if current > maxCurrent:
-            print('No Way! current must be less than ' + maxCurrent + ' mA only.')
-        elif current == 0:
-            # sets the channel
-            self.port.command('channel', channel)
-            time.sleep(2)
-            # turns off the channel because currrent = 0
-            self.port.command('enable', 0)
-            time.sleep(1)
+        if not self.labExperiment:
+            super().changeCurrent(current)
         else:
-            # changes the channel
-            self.port.command('channel', channel)
-            time.sleep(2)
-            # turns on the correct channel
-            self.port.command('enable', channel)
-            time.sleep(2)
-            # changes the current on the channel
-            self.port.command('current', current)
-            self.specs['current'] = current
-            time.sleep(1)
+            # checks to make sure the new current is below the max current and 
+            # then sets the new current on the correct channel
+            if current > self.maxCurrent:
+                print('No Way! current must be less than ' + self.maxCurrent + ' mA only.')
+            elif current == 0:
+                # sets the channel
+                self.port.command('channel', self.channel)
+                time.sleep(2)
+                # turns off the channel because currrent = 0
+                self.port.command('enable', 0)
+                self.current = current
+                time.sleep(1)
+            else:
+                # changes the channel
+                self.port.command('channel', self.channel)
+                time.sleep(2)
+                # turns on the correct channel
+                self.port.command('enable', self.channel)
+                time.sleep(2)
+                # changes the current on the channel
+                self.port.command('current', current)
+                self.current = current
+                time.sleep(1)
     
     def calibrate(self, camera):
         """
@@ -122,7 +127,7 @@ class MCLS1(Sources):
         with the x and y coordinates and the intensity for first the central
         peak and then the secondary one
         """
-        length = self.specs['npixCalib']
+        length = self.npixCalib
         SATURATION =30900
         # sets the current to a low setting for first image
         self.changeCurrent(10, self.specs['channel'])

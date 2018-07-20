@@ -1,7 +1,8 @@
-from OpticalSystem.Camera import Camera
-import numpy as np
-import win32com.client
-from OpticalSystem.Control import ActiveX
+from HCIFS.util.LabControl import ActiveX
+from HCIFS.Devices import Camera
+
+class SXvrh9(Camera):
+	pass
 
 class QSIrs61(Camera):
     """

@@ -1,13 +1,13 @@
 #from Hardware.Camera import Camera
 #from Hardware.Laser import Laser
 #from Hardware.Motor import Motor
-import os.path, json, inspect
-from HCIFS.OpticalSystem.OpticalSystem import OpticalSystem
+import os.path, json, inspect, glob
+import HCIFS.util.imports as imports
 
 
 class Experiment(object):
     
-    def __init__(self, jsonfile=None, nbIter=30, **specs):
+    def __init__(self, jsonfile=None, labExperiment=False, nbIter=30, **specs):
     
         # ensure JSON filename extension
         if jsonfile[-5:].lower() != '.json':
@@ -25,11 +25,27 @@ class Experiment(object):
             raise IOError("'%s' is not a file."%jsonfile)
         except ValueError:
             raise ValueError("Error: script file is formatted incorrectly.")
+        # update local variable 'specs'
+        specs = self.specs
         
-        # initialize the Optical System
-        self.OpticalSystem = OpticalSystem(**self.specs)
+        # create the Devices dictionary of modules (Device, Source, Camera, DM)
+        self.Devices = dict()
+        # loop through the list of dictionaries in 'Devices'
+        devs = 'Devices'
+        assert devs in specs, "'%s' not defined in 'specs'."%devs
+        for device in specs[devs]:
+            assert isinstance(device, dict), "'%s' must be defined as a list of dicts."%devs
+            assert ('name' in device) and isinstance(device['name'], str), \
+                    "All elements of '%s' must have key 'name'."%devs
+            # update the device dictionary with useful keys
+            dev = dict({**device, 'labExperiment':labExperiment})
+            # get the specified class, or use the default 'Device' class
+            classname = device.get('type', 'Device')
+            self.Devices[device['name']] = imports.get_class(classname)(**dev)
+
         
-        
+        # create the distances array
+        #self.distances = np.array([x-y for device in ])
         
 
     def runLaboratory(self):
@@ -50,6 +66,32 @@ class Experiment(object):
         # calibrate the laser
         center, secondary = self.Laser.calibrate()
     
+
+
+    def moveDevice(self, name, movement):
+        for i in range(len(self.optics)):
+            if name == self.optics[i].name:
+                ID = i
+        device = self.optics[ID]
+        stage = createStage(device)
+        stage.goto(movement)
+        deltaZ = movement[2]
+        if deltaZ != 0:
+            if ID == 0:
+                device.dist2next -= deltaZ
+                self.distances[0] += deltaZ
+                self.distances[1] -= deltaZ
+            else:
+                self.optics[ID - 1].dist2next += deltaZ
+                device.dist2next -= deltaZ
+                self.distances[ID] += deltaZ
+                self.distances[ID + 1] -= deltaZ   
+
+
+
+
+
+
     def closeLab(self, ):
         # disconnect and shut off the camera
         self.Camera.disconnect()

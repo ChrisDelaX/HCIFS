@@ -1,7 +1,8 @@
-from OpticalSystem.MotorStage.Motor import Motor
-from OpticalSystem.Control import PyAPT
+from HCIFS.Devices import Stage
+from HCIFS.util.LabControl import PyAPT
 
-class APT(Motor):
+
+class APT(Stage):
     
     def __init__(self, serial_number):
         super().__init__()
