@@ -1,4 +1,4 @@
-from HCIFS.Devices import FilterWheel
+from HCIFS.Device.FilterWheel.FilterWheel import FilterWheel
 from HCIFS.util.LabControl import SerialPort
 
 class FW212b(FilterWheel):

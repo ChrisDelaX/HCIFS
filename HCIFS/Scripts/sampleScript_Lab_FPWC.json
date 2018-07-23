@@ -49,7 +49,7 @@
     { "name": "FPM",
       "type": "BowtieSet",
       "stageTypes": ["MTS50", "MTS50", null],
-      "stageSerials": [83815646, 83815669, null],
+      "stageSerials": ["83815646", "83815669", null],
       "FPMchoice": 9
     },
     { "name": "L1",

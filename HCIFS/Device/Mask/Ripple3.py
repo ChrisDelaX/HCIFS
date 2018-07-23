@@ -1,8 +1,12 @@
-from HCIFS.Devices import DM
+from HCIFS.Device.Mask.Mask import Mask
 
-class BM1k(DM):
+
+class Ripple3(Mask):
+    """Shaped Pupil
+    """
+    
     def __init__(self, **keywords):
-        defaults = {'type': 'BM1k'}
+        defaults = {'type': 'Ripple3'}
         self.specs = keywords
         self.specs.update(defaults)
         self.specs.update(keywords)

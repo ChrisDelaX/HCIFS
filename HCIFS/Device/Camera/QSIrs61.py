@@ -1,8 +1,5 @@
 from HCIFS.util.LabControl import ActiveX
-from HCIFS.Devices import Camera
-
-class SXvrh9(Camera):
-	pass
+from HCIFS.Device.Camera.Camera import Camera
 
 class QSIrs61(Camera):
     """
@@ -16,6 +13,9 @@ class QSIrs61(Camera):
         Creates an instance of the Camera class, and initializes the
         default value.
         """
+        # call the Camera constructor
+        super().__init__(**keywords)
+        
         defaults = {
                 'serialnum': '0', 'shutterStatus': True,'startPos': (0, 0),
                 'imgSize': (500, 500), 'binPix': (4, 4), 'ccdtemp': -15,
@@ -25,7 +25,6 @@ class QSIrs61(Camera):
         self.handle = None
         self.specs = defaults
         self.specs.update(keywords)
-        super().__init__(**keywords)
             
     def connect(self):
         """

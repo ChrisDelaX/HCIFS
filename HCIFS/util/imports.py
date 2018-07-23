@@ -61,13 +61,19 @@ def get_module(modname, folder=''):
         # locate the optional folder, defaults to HCIFS GitHub repository
         path = get_folder(folder)
         # in the given folder, locate the desired module
-        for fp, mn, _ in pkgutil.walk_packages([path]):
-            if mn.endswith(modname):
+        for fp, mn, ispkg in pkgutil.walk_packages([path]):
+            if not ispkg and mn.endswith(modname):
                 full_path = fp.path
                 break
         else:
-            raise RuntimeError("Could not find '%s' module%s" \
-                    %(modname," in '" + folder + "' folder." if folder else '.'))
+            # if no module found, look for a package
+            for fp, mn, ispkg in pkgutil.walk_packages([path]):
+                if ispkg and mn.endswith(modname):
+                    full_path = fp.path
+                    break
+            else:
+                raise RuntimeError("Could not find '%s' module%s" \
+                        %(modname," in '" + folder + "' folder." if folder else '.'))
         # find the module pyfile
         pypath = os.path.join(full_path, modname + '.py')
         # if the module is a package, get the __init__ pyfile
@@ -80,91 +86,4 @@ def get_module(modname, folder=''):
     module = imp.load_source(full_modname, pypath)
     
     return module
-
-def get_class(classname, modname='', **specs):
-    """Get an HCIFS class, from an optional module or package.
-    """
-    assert classname and isinstance(classname, str), "'classname' must be defined as a non-empty string."
-    
-    # load the optional module
-    if any(modname):
-        module = get_module(modname)
-        desired_class = getattr(module, classname, None)
-        # return the desired class
-        if inspect.isclass(desired_class):
-            return desired_class
-        # if could't find the class, get the path of modname
-        path = os.path.dirname(module.__file__)
-    else:
-        # if no modname, get the root path
-        path = get_folder()
-    
-    # examine all modules from path, and look for classes
-    for filename in glob.iglob(os.path.join(path, '**/*.py'), recursive=True):
-        with open(filename,'r') as f:
-            p = ast.parse(f.read())
-            if classname in [node.name for node in ast.walk(p) if isinstance(node, ast.ClassDef)]:
-                module = get_module(filename)
-                desired_class = getattr(module, classname, None)
-                # return the desired class
-                if inspect.isclass(desired_class):
-                    return desired_class
-    else:
-        raise RuntimeError("Could not find '%s' class%s" \
-                %(classname, " in '" + modname + "' module." if modname else '.'))
-
-
-
-def MakeModuleName(*names): 
-    """ 
-    Helper function: make a qualified module name
-    e.g., ('Devices', 'Sources', 'MCLS1') -> 'Devices.Sources.MCLS1'
-    """
-    return '.'.join(names)
-
-def Module(name, type=None):
-    
-    assert hasattr(full_module, module_name), \
-            "Module name is incorrect.  This is not a valid EXOSIMS class."
-    # extract the particular class from the full module's namespace
-    desired_module = getattr(full_module, module_name)
-    
-    return desired_module
-
-
-def DictOfModules(devices, labExperiment=False, **specs):
-    """
-    Creates a dictionary containing all the devices of a type (Sources, Optics,
-    Cameras, Stages), and optionnally adds it to an existing dict. 
-    
-    Each device is an object imported from the module specified by the 
-    keyword 'type'. If no module was specified, the object is created with 
-    the default module: Sources, Optics, Cameras, Stages.
-    """
-    
-    # check the devices have been defined.
-    assert devices in specs, "'%s' not defined in 'specs'."%devices
-    listdicts = specs[devices]
-    
-    # initialize dictionary
-    mods = dict()
-    # loop through the list of dictionaries
-    for ID, device in enumerate(listdicts):
-        assert isinstance(device, dict), "'%s' must be defined as list of dicts in the jsonfile."%devices
-        assert ('name' in device) and isinstance(device['name'], str), \
-                "All elements of '%s' must have key 'name'."%devices
-        # get the specified module, or use the default module
-        folder = 'HCIFS.' + devices + '.'
-        try:
-            moduleName = device['type']
-            module = import_module(folder + moduleName)
-        except:
-            moduleName = devices
-            module = import_module(folder + moduleName)
-        # update the device dictionary with useful keys
-        specs = dict({**device, 'ID':ID, 'labExperiment':labExperiment})
-        # create the module and add to the dictionary of devices
-        mods[device['name']] = getattr(module, moduleName)(**specs)
-        
-    return mods
 

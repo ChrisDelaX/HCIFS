@@ -1,130 +1,4 @@
-from HCIFS import Device
-
-class Mask(Device):
-    """Example: Shaped Pupil, Focla Plane Mask.
-    """
-    pass
-
-class DM(Device):
-    """Deformable Mirrors
-    """
-    pass
-
-class Source(Device):
-    
-    def __init__(self, npixCalib=10, **specs):
-        
-        super().__init__(**specs)
-        
-        # default attributes specific to Sources
-        self.npixCalib = int(specs.get('npixCalib', npixCalib)) # length of calibration area
-    
-    def enable(self):
-        """
-        Enables the source.
-        """
-        assert not self.labExperiment, "Can't 'enable' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-    
-    def disable(self):
-        """
-        Disables the source.
-        """
-        assert not self.labExperiment, "Can't 'disable' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-    
-    def status(self):
-        """
-        Gets the status of the source and returns it.
-        """
-        assert not self.labExperiment, "Can't use 'status' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-        return 'no status'
-    
-    def changeCurrent(self, current):
-        """
-        Changes the current (in mA) of a specific channel of the source
-        """
-        assert not self.labExperiment, "Can't 'change current' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-    
-    def calibrate(self, camera):
-        """
-        Calibrates the source so that the central peak is overasaturated, and
-        the second peaks are just below saturated. It then returns two tuples
-        with the x and y coordinates and the intensity for first the central
-        peak and then the secondary one
-        """
-        centerX, centerY, newCenterPeak = 0, 0, 0
-        secondX, secondY, newSecondPeak = 0, 0, 0
-        return (centerX, centerY, newCenterPeak), (secondX, secondY, newSecondPeak)
-
-
-class Stage(Device):
-    
-    def __init__(self):
-        self.specs = {}
-        self.pos = None
-        self.handle = None
-        self.vel = None
-        self.accel = None
-        
-    def connect(self):
-        """
-        connects the camera and gets current position, velocity, and acceleration
-        """
-        self.pos = self.position()
-        self.vel = self.get_vel()
-        self.accel = self.get_accel()
-    def position(self):
-        """
-        returns the current position of the stage
-        """
-        return 0
-    
-    def goto(self, position):
-        """
-        moves the stage to position
-        """
-        self.pos = self.position()
-    
-    def gotoHome(self):
-        """
-        moves the stage to its home position
-        """
-        self.pos = self.position()
-        
-    def get_vel(self):
-        """
-        gets the current max velocity of the stage
-        """
-        return 0
-    
-    def set_vel(self, velocity):
-        """
-        sets the max velocity of the stage to velocity
-        """
-        self.vel = self.get_vel()
-    
-    def get_accel(self):
-        """
-        gets the current acceleration of the stage
-        """
-        return 0
-        
-    def set_accel(self, acceleration):
-        """
-        sets the accleration of the stage to accleration
-        """
-        self.accel = self.get_accel()
-    
-    def cleanup(self):
-        """
-        releases the connection to the stage
-        """
-        pass
-        
-        
+from HCIFS.Device.Device import Device
 
 class Camera(Device):
     """
@@ -133,13 +7,14 @@ class Camera(Device):
     settings, and taking images.
     """
     
-    def __init__(self, type=None, ID=0, stageTypes=[None,None,None], 
-            stageSerials=[None,None,None], **specs):
+    def __init__(self, **specs):
         """
         Creates an instance of the Cameras class. The 'name' attribute is the only one 
         that MUST be defined in the scriptfile, e.g., 'DM1', 'SP', 'FPM' (for deformable
         mirror 1, shaped pupil, focal plane mask).
         """
+        # call the Device constructor
+        super().__init__(**specs)
 
         self.specs = {'type': None, 'dist2prev': 0, 'name': None,
                       'defaultPosition': (0, 0), 'stageType': None,
@@ -324,48 +199,3 @@ class Camera(Device):
         if self.handle == None:
             raise Exception('Camera not connected.')
 
-class FilterWheel(Device):
-    
-    def __init__(self, **keywords):
-        """
-        Creats an instance of the FilterWheel class. Creates a port attribute to
-        hold the connection to the filter wheel.
-        """
-        self.specs = {}
-        self.port = None
-        self.position
-        
-    def getPosition(self):
-        """
-        Gets the current position of the filter wheel
-        Returns an integer from 1 - 12
-        """
-        self.position = 0
-        return self.position
-    
-    def setPosition(self, position):
-        """
-        Changes the position of the filter wheel
-        pos must be an integer from 1 - 12
-        """
-        self.position = position
-    
-    def moveUp(self):
-        """
-        Moves the filterwheel up one position
-        """
-        currentPosition = int(self.getPosition())
-        if currentPosition == 12:
-            currentPosition = 0
-        self.setPosition(currentPosition + 1)
-        self.position = currentPosition + 1
-        
-    def moveDown(self):
-        """
-        Moves the filterwheel down one position
-        """
-        currentPosition = int(self.getPosition())
-        if currentPosition == 1:
-            currentPosition = 13
-        self.setPosition(currentPosition - 1)
-        self.position = currentPosition - 1

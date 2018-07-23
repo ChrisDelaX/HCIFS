@@ -23,14 +23,11 @@
 #       # length defines the size of the area that is searched for a guassian
 #       # length = 10 seems to work. camera is the an isntance of Camera class
 
-from HCIFS.Devices import Source
+from HCIFS.Device.Source.Source import Source
 from HCIFS.util.img_processing import fit_gauss_2D
 import time
 import numpy as np
 import astropy.units as u
-
-class NKTsuperK(Source):
-    pass
 
 class MCLS1(Source):
     def __init__(self, port='COM3', current=0, channel=1, **specs):

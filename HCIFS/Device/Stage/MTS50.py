@@ -1,13 +1,12 @@
-from HCIFS.Devices import Stage
+from HCIFS.Device.Stage.Stage import Stage
 from HCIFS.util.LabControl import PyAPT
 
 
-class APT(Stage):
+class MTS50(Stage):
     
-    def __init__(self, serial_number):
-        super().__init__()
-        self.specs = {'serial_number': None, 'HWTYPE': 42}
-        self.specs['serial_number'] = serial_number
+    def __init__(self, type=None, serial=None):
+        super().__init__(type=type, serial=serial)
+        self.HWTYPE = 42
 
     def connect(self):
         """

@@ -1,0 +1,3 @@
+class WavefrontControl(object):
+    
+    pass

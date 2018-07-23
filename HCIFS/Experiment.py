@@ -2,8 +2,8 @@
 #from Hardware.Laser import Laser
 #from Hardware.Motor import Motor
 import os.path, json, inspect, glob
-import HCIFS.util.imports as imports
-
+from HCIFS.util.imports import get_module
+import numpy as np
 
 class Experiment(object):
     
@@ -28,24 +28,70 @@ class Experiment(object):
         # update local variable 'specs'
         specs = self.specs
         
-        # create the Devices dictionary of modules (Device, Source, Camera, DM)
+        # create the Devices dictionary of modules (Source, Camera, DM, Mask, ...)
         self.Devices = dict()
         # loop through the list of dictionaries in 'Devices'
         devs = 'Devices'
         assert devs in specs, "'%s' not defined in 'specs'."%devs
-        for device in specs[devs]:
+        for ID, device in enumerate(specs[devs]):
             assert isinstance(device, dict), "'%s' must be defined as a list of dicts."%devs
             assert ('name' in device) and isinstance(device['name'], str), \
                     "All elements of '%s' must have key 'name'."%devs
             # update the device dictionary with useful keys
-            dev = dict({**device, 'labExperiment':labExperiment})
-            # get the specified class, or use the default 'Device' class
-            classname = device.get('type', 'Device')
-            self.Devices[device['name']] = imports.get_class(classname)(**dev)
+            dev = dict({**device, 'ID':ID, 'labExperiment':labExperiment})
+            # get the specified module, or use the default 'Device' module
+            modname = device.get('type', 'Device')
+            module = get_module(modname)
+            self.Devices[device['name']] = getattr(module, modname)(**dev)
+        
+        # Load the loops array, or create a default loop of Devices sorted by ID
+        loops = np.array(specs.get('loops', [dev.name for dev \
+                in sorted(self.Devices.values(), key=lambda dev: dev.ID)]), ndmin=2)
+        # create the FPWC and IFS loops.
+        if loops.shape[0] >= 2:
+            self.loop_FPWC = loops[0]
+            self.loop_IFS = loops[1]
+        else:
+            self.loop_FPWC = self.loop_IFS = loops
+        # Load the distances array, must be the size of loops minus 1. Default to zeros.
+        distances = np.array(specs.get('distances', np.zeros(loops.shape[1]-1)), ndmin=2)
+        # create the FPWC and IFS distances.
+        if distances.shape[0] >= 2:
+            self.distances_FPWC = distances[0]
+            self.distances_IFS = distances[1]
+        else:
+            self.distances_FPWC = self.distances_IFS = loops
+
+#### ADD assert shapes distances vs loops
 
         
-        # create the distances array
-        #self.distances = np.array([x-y for device in ])
+    def moveDevice(self, name, movement):
+        """Check for motorized stages on a device, then change the position of the 
+        device by introducing a relative movement in x,y,z.
+        """
+        for i, (type, serial) in enumerate(zip(stageTypes, stageSerials)):
+            # get the specified module, or use the default 'Stage' module
+            type = type if type is not None else 'Stage'
+            # create a Stage
+            module = get_module(type, 'Stage')
+            Stage = getattr(module, type)(type=type, serial=serial)
+            Stage.moveDevice(movement)
+            # update the distances array
+            deltaZ = movement[2]
+            if deltaZ != 0:
+                if ID == 0:
+                    device.dist2next -= deltaZ
+                    self.distances[0] += deltaZ
+                    self.distances[1] -= deltaZ
+                else:
+                    self.optics[ID - 1].dist2next += deltaZ
+                    device.dist2next -= deltaZ
+                    self.distances[ID] += deltaZ
+                    self.distances[ID + 1] -= deltaZ   
+
+
+                
+        
         
 
     def runLaboratory(self):
@@ -66,30 +112,6 @@ class Experiment(object):
         # calibrate the laser
         center, secondary = self.Laser.calibrate()
     
-
-
-    def moveDevice(self, name, movement):
-        for i in range(len(self.optics)):
-            if name == self.optics[i].name:
-                ID = i
-        device = self.optics[ID]
-        stage = createStage(device)
-        stage.goto(movement)
-        deltaZ = movement[2]
-        if deltaZ != 0:
-            if ID == 0:
-                device.dist2next -= deltaZ
-                self.distances[0] += deltaZ
-                self.distances[1] -= deltaZ
-            else:
-                self.optics[ID - 1].dist2next += deltaZ
-                device.dist2next -= deltaZ
-                self.distances[ID] += deltaZ
-                self.distances[ID + 1] -= deltaZ   
-
-
-
-
 
 
     def closeLab(self, ):
