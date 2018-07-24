@@ -26,7 +26,7 @@ class Camera(Device):
         self.originPix = np.array(specs.get('originPix', originPix), dtype = 'int')
         self.imgSize = np.array(specs.get('imgSize', imgSize), dtype = 'int')
         self.binPix = np.array(specs.get('binPix', binPix), dtype = 'int')
-        self.ccdtemp = int(specs.get('ccdtemp', ccdtemp)
+        self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         self.darkCam = specs.get('darkCam', darkCam)
     
     def avgImg(self, expTime, numIm, Xc = None, Yc = None, Rx = None,

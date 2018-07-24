@@ -1,7 +1,6 @@
 from HCIFS.util.LabControl import ActiveX
 from HCIFS.Device.Camera.Camera import Camera
 import numpy as np
-import win32com.client
 import time
 
 class SXvrh9(Camera):
@@ -90,7 +89,7 @@ class SXvrh9(Camera):
             """
         if not self.labExperiment:
             super().avgImg(expTime, numIm, Source = None, Xc = None, Yc = None,
-                 Rx = None, Ry = None)
+                    Rx = None, Ry = None)
         else:
             if self.connection == None:
                 raise Exception('Camera not connected.')
@@ -175,7 +174,7 @@ class SXvrh9(Camera):
             return np.array(exp)
 
     def exposureProperties(self, originPix, imgSize, binPix):
-         """
+        """
         Changes the exposure properties of the camera
         
         Input:

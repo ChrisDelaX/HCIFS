@@ -1,7 +1,6 @@
 from HCIFS.util.LabControl import ActiveX
 from HCIFS.Device.Camera.Camera import Camera
 import numpy as np
-import win32com.client
 import time
 
 class QSIrs61(Camera):
@@ -17,6 +16,7 @@ class QSIrs61(Camera):
             progID - used for connecting to camera (string)
         """
         super().__init__(**specs)
+        
         self.serialnum = str(specs.get('serialnum', serialnum))
         self.progId = str(specs.get('progID', progID))
     
@@ -58,8 +58,6 @@ class QSIrs61(Camera):
                 if ex == AttributeError:
                     print('Lost connection of camera, unplug USB manually!')
                     self.connection = None
-                elif ex == win32com.client.pywintypes.com_error:
-                    print('Wrong camera name!')
                 else:
                     raise ex
 

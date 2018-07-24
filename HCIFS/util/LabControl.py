@@ -1,5 +1,3 @@
-# uses michael leung's pyapt module for controlling thorlabs apt motors
-# https://github.com/mcleu/PyAPT
 import time
 
 
