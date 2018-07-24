@@ -1,8 +1,10 @@
 from HCIFS.util.imports import get_module
+import astropy.units as u
 
 class Device(object):
     
-    def __init__(self, type=None, ID=0, stageTypes=[None,None,None], stageSerials=[None,None,None], labExperiment=False, **specs):
+    def __init__(self, type=None, ID=0, position=[0,0,0], stageTypes=[None,None,None], 
+            stageSerials=[None,None,None], labExperiment=False, **specs):
         """
         Creates an instance of the Prototype class within the Device module.
         The 'name' attribute is the only one that MUST be defined in the scriptfile.
@@ -16,6 +18,7 @@ class Device(object):
         assert self.name != None, "Must provide a name"
         self.type = specs.get('type', type)                     # device type
         self.ID = int(specs.get('ID', ID))                      # identification number
+        self.position = specs.get('position', position)*u.mm    # x,y,z position in mm
         self.stageTypes = specs.get('stageTypes', stageTypes)   # (motor)stage types (x,y,z)
         self.stageSerials = specs.get('stageSerials', stageSerials)# (motor)stage serials (x,y,z)
         self.labExperiment = bool(specs.get('labExperiment', labExperiment))# lab flag

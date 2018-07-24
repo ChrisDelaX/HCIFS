@@ -6,7 +6,8 @@ class Camera(Device):
     A dummy class to represent a connected camera
     """
     
-    def __init__(self, originPix = (0, 0), imgSize = (500, 500), binPix = (4, 4), ccdtemp = -15, darkCam = None, **specs):
+    def __init__(self, originPix=[0,0], imgSize=[500,500], binPix=[4,4], 
+            ccdtemp=-15, darkCam=None, **specs):
         """
         Constructor for the camera class. Uses the parent 'Device' class.
         Inputs:
@@ -16,9 +17,11 @@ class Camera(Device):
             ccdtemp - the temperature the camera is set to (number)
             darkCam - image used to reduce dark current (np array)
         """
-        # call the 'Device' instructor
+        
+        # call the Device constructor
         super().__init__(**specs)
-        # set up instance variables
+        
+        # load specific Camera attributes
         self.connection = None
         self.originPix = np.array(specs.get('originPix', originPix), dtype = 'int')
         self.imgSize = np.array(specs.get('imgSize', imgSize), dtype = 'int')

@@ -3,8 +3,6 @@ import glob
 import pkgutil
 import importlib
 import imp
-import ast
-import inspect
 
 def get_folder(folder=''):
     """Get the path to a specific HCIFS module folder. Defaults to HCIFS GitHub repository.
