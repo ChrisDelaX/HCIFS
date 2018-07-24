@@ -8,17 +8,21 @@ class QSIrs61(Camera):
     A class for controlling a QSIrs61 camera
     """
     
-    def __init__(self, serialnum = '0', progID = 'QSICamera.CCDCamera', **specs):
+    def __init__(self, saturation=30900, serialnum='0', progID ='QSICamera.CCDCamera', ccdtemp=-15,
+                 **specs):
         """
         Constructor for the QSIrs61 camera
         Inputs:
-            serialnum - used for identifying the correct camera
+            saturation - saturation value for the QSIrs61 (int)
+            serialnum - used for identifying the correct camera (str)
             progID - used for connecting to camera (string)
         """
         super().__init__(**specs)
         
-        self.serialnum = str(specs.get('serialnum', serialnum))
-        self.progId = str(specs.get('progID', progID))
+        self.saturation = int(specs.get('saturation', saturation)
+        self.serialnum = specs.get('serialnum', serialnum)
+        self.progId = specs.get('progID', progID)
+        self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
     
     def enable(self):
         """
@@ -145,7 +149,7 @@ class QSIrs61(Camera):
                                             int(Yc - Ry) : int(Yc + Ry)]
             # checks to see if image is saturated
             saturated = False
-            if np.max(img) >= 30900:
+            if np.max(img) >= self.saturation:
                 saturated = True
 
             return avgImgCropped, saturated

@@ -7,15 +7,16 @@ class Camera(Device):
     """
     
     def __init__(self, originPix=[0,0], imgSize=[500,500], binPix=[4,4], 
-            ccdtemp=-15, darkCam=None, **specs):
+            ccdtemp=0, darkCam=None, saturation = 50000, **specs):
         """
         Constructor for the camera class. Uses the parent 'Device' class.
         Inputs:
             originPix - the starting position of the image (tuple len.2)
             imgSize - the dimensions of the image (tuple len. 2)
             binPix - the number of pixels for binning (tuple len. 2)
-            ccdtemp - the temperature the camera is set to (number)
+            ccdtemp - the celsius temperature the camera is set to (number)
             darkCam - image used to reduce dark current (np array)
+            saturation - saturation value for the QSIrs61 (int)
         """
         
         # call the Device constructor
@@ -28,6 +29,7 @@ class Camera(Device):
         self.binPix = np.array(specs.get('binPix', binPix), dtype = 'int')
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         self.darkCam = specs.get('darkCam', darkCam)
+        self.saturation = int(specs.get('saturation', saturation)
     
     def avgImg(self, expTime, numIm, Xc = None, Yc = None, Rx = None,
                Ry = None, Source = None):

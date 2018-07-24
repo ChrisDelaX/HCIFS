@@ -1,47 +1,57 @@
 from HCIFS.Device.Device import Device
 
 class FilterWheel(Device):
+    """
+    A class for representing a generic filterwheel
+    """
     
-    def __init__(self, **keywords):
+    def __init__(self, numOfFilters=0, **specs):
         """
-            Creats an instance of the FilterWheel class. Creates a port attribute to
-            hold the connection to the filter wheel.
-            """
-        self.specs = {}
-        self.port = None
-        self.filterNum = None
+        Constructor for the 'FilterWheel' class
+        Inputs:
+            numOfFilters: number of filters on wheel (int)
+        """
+        # call the 'Device' __init__
+        super().__init__(**specs)
     
     def getFilter(self):
         """
-            Gets the current position of the filter wheel
-            Returns an integer from 1 - 12
-            """
-        self.filterNum = 0
-        return self.filterNum
+        Dummy function for getting current filter
+        """
+        assert not self.labExperiment, "Can't use 'getFilter' with default 'FilterWheel' class."
+        print("Turn 'labExperiment = True' to run the lab.")
+        return 0
     
     def setFilter(self, filterNum):
         """
-            Changes the position of the filter wheel
-            pos must be an integer from 1 - 12
-            """
-        self.filterNum = filterNum
+        Dummy class for changing which filter is active
+        Inputs:
+            filterNum - the filter to use (int)
+        """
+        assert not self.labExperiment, "Can't use 'setFilter' with default 'FilterWheel' class."
+        print("Turn 'labExperiment = True' to run the lab.")
     
     def moveUp(self):
         """
-            Moves the filterwheel up one position
-            """
-        currentFilter = int(self.getFilter())
-        if currentFilter == 12:
-            currentFilter = 0
-        self.setFilter(currentFilter + 1)
-        self.filterNum = currentFilter + 1
-    
+        Dummy class for moving the filterwheel up one position
+        """
+        if self.labExperiment:
+            currentFilter = int(self.getFilter())
+            if currentFilter == self.numOfFilters:
+                currentFilter = 0
+            self.setFilter(currentFilter + 1)
+        else:
+            raise Exception("Can't use 'moveUp' with default 'Camera' class.")
+            print("Turn 'labExperiment = True' to run the lab.")
     def moveDown(self):
         """
-            Moves the filterwheel down one position
-            """
-        currentFilter = int(self.getFilter())
-        if currentFilter == 1:
-            currentFilter = 13
-        self.setFilter(currentFilter - 1)
-        self.filterNum = currentFilter - 1
+        Dummy class for moving the filterwheel up one position
+        """
+        if self.labExperiment:
+            currentFilter = int(self.getFilter())
+            if currentFilter == 1:
+                currentFilter = self.numOfFilters + 1
+            self.setFilter(currentFilter - 1)
+        else:
+            raise Exception("Can't use 'realTime' with default 'Camera' class.")
+            print("Turn 'labExperiment = True' to run the lab.")

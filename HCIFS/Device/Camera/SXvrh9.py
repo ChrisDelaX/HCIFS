@@ -7,11 +7,13 @@ class SXvrh9(Camera):
     """
     A class for controlling an SXvrh9 camera
     """
-    def __init__(self, progID = 'MaxIm.CCDCamera', **specs):
+    def __init__(self, saturation=64000, progID='MaxIm.CCDCamera', ccdtemp = -5, **specs):
         """
         Constructor for the SXvrh9 camera. Uses the parent 'Camera' and 'Device' classes
         Inputs:
+            saturation - saturation value for the SXvrh9 (int)
             progID - used for connecting to camera (string)
+            ccdtemp - the celsius temperature the camera is set to in (number)
         """
         
         # call the 'Camera' constructor
@@ -25,7 +27,9 @@ class SXvrh9(Camera):
         self.msec = 0.001;
         
         #set up instance variables
-        self.progID = str(specs.get('progID', progID))
+        self.saturation = int(specs.get('saturation', saturation)
+        self.progID = specs.get('progID', progID)
+        self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         
         # Connect to the camera
         if self.labExperiment is True:
@@ -139,7 +143,7 @@ class SXvrh9(Camera):
                                             int(Yc - Ry) : int(Yc + Ry)]
             # checks to see if image is saturated
             saturated = False
-            if np.max(img) >= 64000:
+            if np.max(img) >= self.saturation:
                 saturated = True
 
             return avgImgCropped, saturated

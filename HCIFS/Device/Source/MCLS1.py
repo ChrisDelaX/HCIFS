@@ -1,27 +1,4 @@
 # MCLS1 - provides basic control of ThorLabs 4-Channel Fiber-Coupled Laser Source
-#
-# Matthew Grossman from Princeton HCIL - Jun. 5, 2018
-# Based on a Matlab function developed by He Sun
-#Brief Usage:
-#    To enable the laser:
-#       # specs is an optional dictionary of default values to change
-#        laser = Laser(specs)
-#        laser.enable()
-#    To disable the laser:
-#        laser.disable()
-#    To get the status of the laser:
-#        status = laser.status
-#    To change the current of the laser:
-#        laser.changeCurrent(current, channel)
-#        # Channel   |   Max Current
-#        # 1         |   68.09
-#        # 2         |   63.89
-#        # 3         |   41.59
-#        # 4         |   67.39
-#    To calibrate the laser:
-#        center, secondary = laser.calibrate(image, length, camera)
-#       # length defines the size of the area that is searched for a guassian
-#       # length = 10 seems to work. camera is the an isntance of Camera class
 
 from HCIFS.Device.Source.Source import Source
 from HCIFS.util.img_processing import fit_gauss_2D
@@ -40,9 +17,9 @@ class MCLS1(Source):
         Constructor for the MCLS1 class.
         
         Inputs:
-            port: the COM port the MCLS1 is attached to
-            current: the default current for the source in mA
-            channel: the channel the object controls (1 - 4)
+            port: the COM port the MCLS1 is attached to (str)
+            current: the default current for the source in mA (int)
+            channel: the channel the object controls (1 - 4) (int)
         
         """
         # call the Sources constructor
@@ -150,7 +127,7 @@ class MCLS1(Source):
                     intensity of the second peak)
         """
         length = self.npixCalib
-        SATURATION =30900
+        saturation = camera.saturation
         # sets the current to a low setting for first image
         self.changeCurrent(10, self.specs['channel'])
 ### get updated values for taking the first pic
@@ -193,7 +170,7 @@ class MCLS1(Source):
         # changes power until the second peak intensity falls within 70-80%
         # of saturation
         counter = 0
-        while intensity < .7 * SATURATION or intensity > .8 * SATURATION:
+        while intensity < .7 * saturation or intensity > .8 * saturation:
             if intensity < .7:
                 newCurrent += 5
             else:

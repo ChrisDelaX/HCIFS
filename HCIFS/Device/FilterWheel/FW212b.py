@@ -2,43 +2,48 @@ from HCIFS.Device.FilterWheel.FilterWheel import FilterWheel
 from HCIFS.util.LabControl import SerialPort
 
 class FW212b(FilterWheel):
-    
-    def __init__(self, **keywords):
+    """
+    Controls the Thorlabs FW212b filterwheel
+    """
+    def __init__(self, port='COM12', numOfFilters=12, **specs):
         """
-        Creats an instance of the FilterWheel class. Creates a port attribute to
-        hold the connection to the filter wheel.
+        Constructor for the 'FW212b' class.
+        Inputs:
+            port: the COM port the FW212b is attached to (str)
+            numOfFilters: number of filters on wheel (int)
         """
-        defaults = {
-                'port': 'COM12', 'baudrate': 115200, 'bytesize': 8,
-                'stopbits': 1,
-                }
-        self.specs = defaults
-        self.specs.update(keywords)
+        # call the 'FilterWheel' class __init__
+        super().__init__(**specs)
+        
+        # create attributes
+        self.port = specs.get('port', port)
+        self.numOfFilters = int(specs.get('numOfFilters', numOfFilters))
+        
         # connects to the filter wheel
-        self.port = SerialPort(comPort = self.specs.get('port'),
-                               baudRate = self.specs.get('baudrate'),
-                               byteSize = self.specs.get('bytesize'),
-                               stopBits = self.specs.get('stopbits'))
-        self.filterNum = 0
+        if self.LabExperiment == True:
+            self.port = SerialPort(comPort = self.specs.get('port', port))
     
     def getFilter(self):
         """
         Gets the current position of the filter wheel
         Returns an integer from 1 - 12
         """
-        super().getFilter()
-        # queries for current filter position
-        self.filterNum = self.port.query('pos')
-        return self.filterNum
+        if not self.LabExperiment:
+            super().getFilter()
+        else:
+        # queries for current filter
+        return self.port.query('pos')
     
     def setFilter(self, filterNum):
         """
         Changes the position of the filter wheel
         pos must be an integer from 1 - 12
         """
-        super().setFilter(filter)
-        # makes sure pos is between 1 and 12 inclusive
-        if filterNum < 1 or filterNum > 12:
-            raise ValueError("Filter number must be an integer from 1 to 12")
-        # writes the command to the port
-        self.port.command('pos', filterNum)
+        if not self.LabExperiment:
+            super().setFilter(filter)
+        else:
+            # makes sure pos is between 1 and 12 inclusive
+            if filterNum < 1 or filterNum > self.numOfFilters:
+                raise ValueError("Filter number must be an integer from 1 to 12")
+            # writes the command to the port
+            self.port.command('pos', filterNum)
