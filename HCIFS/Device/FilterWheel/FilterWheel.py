@@ -4,44 +4,44 @@ class FilterWheel(Device):
     
     def __init__(self, **keywords):
         """
-        Creats an instance of the FilterWheel class. Creates a port attribute to
-        hold the connection to the filter wheel.
-        """
+            Creats an instance of the FilterWheel class. Creates a port attribute to
+            hold the connection to the filter wheel.
+            """
         self.specs = {}
         self.port = None
-        self.position
-        
-    def getPosition(self):
-        """
-        Gets the current position of the filter wheel
-        Returns an integer from 1 - 12
-        """
-        self.position = 0
-        return self.position
+        self.filterNum = None
     
-    def setPosition(self, position):
+    def getFilter(self):
         """
-        Changes the position of the filter wheel
-        pos must be an integer from 1 - 12
+            Gets the current position of the filter wheel
+            Returns an integer from 1 - 12
+            """
+        self.filterNum = 0
+        return self.filterNum
+    
+    def setFilter(self, filterNum):
         """
-        self.position = position
+            Changes the position of the filter wheel
+            pos must be an integer from 1 - 12
+            """
+        self.filterNum = filterNum
     
     def moveUp(self):
         """
-        Moves the filterwheel up one position
-        """
-        currentPosition = int(self.getPosition())
-        if currentPosition == 12:
-            currentPosition = 0
-        self.setPosition(currentPosition + 1)
-        self.position = currentPosition + 1
-        
+            Moves the filterwheel up one position
+            """
+        currentFilter = int(self.getFilter())
+        if currentFilter == 12:
+            currentFilter = 0
+        self.setFilter(currentFilter + 1)
+        self.filterNum = currentFilter + 1
+    
     def moveDown(self):
         """
-        Moves the filterwheel down one position
-        """
-        currentPosition = int(self.getPosition())
-        if currentPosition == 1:
-            currentPosition = 13
-        self.setPosition(currentPosition - 1)
-        self.position = currentPosition - 1
+            Moves the filterwheel down one position
+            """
+        currentFilter = int(self.getFilter())
+        if currentFilter == 1:
+            currentFilter = 13
+        self.setFilter(currentFilter - 1)
+        self.filterNum = currentFilter - 1

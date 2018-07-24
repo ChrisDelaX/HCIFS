@@ -30,10 +30,20 @@ import numpy as np
 import astropy.units as u
 
 class MCLS1(Source):
+    """
+    A class used to control an MCLS1 laser. The laser must be attached to the
+    computer through a com port or com-usb connection. The enable method
+    must be called before the source can be used.
+    """
     def __init__(self, port='COM3', current=0, channel=1, **specs):
         """
-        Creates an instance of the MCLS1 class. Creates a port attribute to
-        hold the connection to the laser.
+        Constructor for the MCLS1 class.
+        
+        Inputs:
+            port: the COM port the MCLS1 is attached to
+            current: the default current for the source in mA
+            channel: the channel the object controls (1 - 4)
+        
         """
         # call the Sources constructor
         super().__init__(**specs)
@@ -51,10 +61,12 @@ class MCLS1(Source):
         if self.labExperiment is True:
             from HCIFS.Utils.LabControl import SerialPort
             self.port = SerialPort(comPort=self.port)
-        
+    
     def enable(self):
         """
         Enables the MCLS1.
+        
+        Turns the system on and then waits for the laser to warm up.
         """
         if not self.labExperiment:
             super().enable()
@@ -63,66 +75,79 @@ class MCLS1(Source):
             self.port.command('system', 1)
             print('Laser is now enabled')
             # closes the port
-            time.sleep(3)
-        
+            time.sleep(2)
+    
     def disable(self):
         """
-        Disables the laser.
+        Disables the MCLS1.
+        
+        Turns the system off and then waits for the laser to cool off.
         """
         if not self.labExperiment:
             super().disable()
         else:
+            # disables the current channel
             self.port.command('enable', 0)
+            # turns off the whole system
             self.port.command('system', 0)
             print('Laser is now disabled')
-            time.sleep(3)
+            time.sleep(2)
         
     def status(self):
         """
-        Gets the status of the MCLS1 and returns it.
+        Gets the status of the MCLS1.
+        
+        Outputs: the status of the laser as a binary number of 8 digits
         """
         if not self.labExperiment:
             super().status()
         else:
+            # returns the status of the laser
             return self.port.query('statword')
-    
+
     def changeCurrent(self, current):
         """
-        Changes the current (in mA) of a specific channel of the MCLS1
+        Changes the current of the MCLS1 on the channel associated with  object.
+        
+        Input: the current in milliAmps
         """
         if not self.labExperiment:
             super().changeCurrent(current)
         else:
-            # checks to make sure the new current is below the max current and 
+            # checks to make sure the new current is below the max current and
             # then sets the new current on the correct channel
             if current > self.maxCurrent:
                 print('No Way! current must be less than ' + self.maxCurrent + ' mA only.')
             elif current == 0:
                 # sets the channel
                 self.port.command('channel', self.channel)
-                time.sleep(2)
                 # turns off the channel because currrent = 0
                 self.port.command('enable', 0)
                 self.current = current
-                time.sleep(1)
             else:
                 # changes the channel
                 self.port.command('channel', self.channel)
-                time.sleep(2)
                 # turns on the correct channel
                 self.port.command('enable', self.channel)
-                time.sleep(2)
                 # changes the current on the channel
                 self.port.command('current', current)
                 self.current = current
-                time.sleep(1)
     
     def calibrate(self, camera):
         """
         Calibrates the MCLS1 so that the central peak is overasaturated, and
-        the second peaks are just below saturated. It then returns two tuples
-        with the x and y coordinates and the intensity for first the central
-        peak and then the secondary one
+        the second peaks are just below saturated.
+        
+        It uses a square of sidelength 2 * self.npixCalib centered on the two
+        peaks to fit gaussians and get more accurate information.
+        
+        Inputs: The camera object used for calibration
+        
+        Output:
+            Tuple: (x-coordinate of central peak, y-coordinate of central peak,
+                    intensity of the central peak)
+            Tuple: (x-coordinate of second peak, y-coordinate of sedond peak,
+                    intensity of the second peak)
         """
         length = self.npixCalib
         SATURATION =30900

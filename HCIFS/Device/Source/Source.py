@@ -1,49 +1,51 @@
 from HCIFS.Device.Device import Device
 
 class Source(Device):
-    
+    """
+    A class used to represent sources.
+    """
     def __init__(self, npixCalib=10, **specs):
+        """
+        Constructor of the dummy class for source.
         
+        Inputs:
+            npixCalib: half the length in pixels of the squares used for calibration
+        """
         super().__init__(**specs)
         
         # default attributes specific to Sources
         self.npixCalib = int(specs.get('npixCalib', npixCalib)) # length of calibration area
     
-    def enable(self):
-        """
-        Enables the source.
-        """
-        assert not self.labExperiment, "Can't 'enable' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-    
-    def disable(self):
-        """
-        Disables the source.
-        """
-        assert not self.labExperiment, "Can't 'disable' with default 'Sources' module."
-        print("Turn 'labExperiment = True' to run the lab.")
-    
     def status(self):
         """
-        Gets the status of the source and returns it.
+        Dummy method for getting status
+        
+        Outpus: status
         """
-        assert not self.labExperiment, "Can't use 'status' with default 'Sources' module."
+        assert not self.labExperiment, "Can't use 'status' with default 'Source' class."
         print("Turn 'labExperiment = True' to run the lab.")
         return 'no status'
     
     def changeCurrent(self, current):
         """
-        Changes the current (in mA) of a specific channel of the source
+        Dummy method for changing current
+        
+        Input: the current in milliAmps
         """
-        assert not self.labExperiment, "Can't 'change current' with default 'Sources' module."
+        assert not self.labExperiment, "Can't 'change current' with default 'Source' class."
         print("Turn 'labExperiment = True' to run the lab.")
     
     def calibrate(self, camera):
         """
-        Calibrates the source so that the central peak is overasaturated, and
-        the second peaks are just below saturated. It then returns two tuples
-        with the x and y coordinates and the intensity for first the central
-        peak and then the secondary one
+        Dummy method for calibration.
+        
+        Inputs: The camera object used for calibration
+        
+        Output:
+            Tuple: (x-coordinate of central peak, y-coordinate of central peak,
+                    intensity of the central peak)
+            Tuple: (x-coordinate of second peak, y-coordinate of sedond peak,
+                    intensity of the second peak)
         """
         centerX, centerY, newCenterPeak = 0, 0, 0
         secondX, secondY, newSecondPeak = 0, 0, 0

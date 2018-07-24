@@ -2,7 +2,7 @@ from HCIFS.Device.FilterWheel.FilterWheel import FilterWheel
 from HCIFS.util.LabControl import SerialPort
 
 class FW212b(FilterWheel):
-     
+    
     def __init__(self, **keywords):
         """
         Creats an instance of the FilterWheel class. Creates a port attribute to
@@ -10,7 +10,7 @@ class FW212b(FilterWheel):
         """
         defaults = {
                 'port': 'COM12', 'baudrate': 115200, 'bytesize': 8,
-                'stopbits': 1, 
+                'stopbits': 1,
                 }
         self.specs = defaults
         self.specs.update(keywords)
@@ -19,26 +19,26 @@ class FW212b(FilterWheel):
                                baudRate = self.specs.get('baudrate'),
                                byteSize = self.specs.get('bytesize'),
                                stopBits = self.specs.get('stopbits'))
-        self.position = 0
-        
-    def getPosition(self):
+        self.filterNum = 0
+    
+    def getFilter(self):
         """
         Gets the current position of the filter wheel
         Returns an integer from 1 - 12
         """
-        super().getPosition()
+        super().getFilter()
         # queries for current filter position
-        self.position = self.port.query('pos')
-        return self.position
+        self.filterNum = self.port.query('pos')
+        return self.filterNum
     
-    def setPosition(self, position):
+    def setFilter(self, filterNum):
         """
         Changes the position of the filter wheel
         pos must be an integer from 1 - 12
         """
-        super().setPosition(position)
+        super().setFilter(filter)
         # makes sure pos is between 1 and 12 inclusive
-        if position < 1 or position > 12:
-            raise ValueError("Position must be an integer from 1 to 12")
+        if filterNum < 1 or filterNum > 12:
+            raise ValueError("Filter number must be an integer from 1 to 12")
         # writes the command to the port
-        self.port.command('pos', position)
+        self.port.command('pos', filterNum)
