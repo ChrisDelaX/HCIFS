@@ -1,7 +1,6 @@
 from HCIFS.util.LabControl import ActiveX
 from HCIFS.Device.Camera.Camera import Camera
 import numpy as np
-import time
 
 class QSIrs61(Camera):
     """
@@ -21,7 +20,7 @@ class QSIrs61(Camera):
         
         self.saturation = int(specs.get('saturation', saturation))
         self.serialnum = specs.get('serialnum', serialnum)
-        self.progId = specs.get('progID', progID)
+        self.progID = specs.get('progID', progID)
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
     
     def enable(self):
@@ -51,9 +50,9 @@ class QSIrs61(Camera):
                 if self.connection.query('IsMainCamera') == False:
                     self.connection.command('IsMainCamera', True)
                 # set the correct ccdtemperature
-                self.setTemperature(self.temperature)
+                self.setTemperature(self.ccdtemp)
                 # set the shutter priority to electrical
-                self.shutterPriotiry(1)
+                self.shutterPriority(1)
                 # set camera gain to self gain
                 if self.connection.query('CameraGain') != 1:
                     self.connection.command('CameraGain', 1)
@@ -164,7 +163,7 @@ class QSIrs61(Camera):
         Outputs:
             image - image captured by camera (numpy array)
         """
-        if not self.labExperimetn:
+        if not self.labExperiment:
             super().exposure(expTime)
         else:
             # Starts an exposure on the camera
@@ -192,12 +191,12 @@ class QSIrs61(Camera):
             super().exposureProperties(originPix, imgSize, binPix)
         else:
             # sends the exposure properties to the camera
-            self.connection.command('StartX', originPix[0])
-            self.connection.command('StartY', originPix[1])
-            self.connection.command('NumX', imgSize[0])
-            self.connection.command('NumY', imgSize[1])
-            self.connection.command('BinX', binPix[0])
-            self.connection.command('BinY', binPix[1])
+            self.connection.command('StartX', int(originPix[0]))
+            self.connection.command('StartY', int(originPix[1]))
+            self.connection.command('NumX', int(imgSize[0]))
+            self.connection.command('NumY', int(imgSize[1]))
+            self.connection.command('BinX', int(binPix[0]))
+            self.connection.command('BinY', int(binPix[1]))
             # update the camera attributes
             self.imgSize = imgSize
             self.originPix = originPix

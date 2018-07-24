@@ -9,7 +9,8 @@ class BM1k(DM):
     DM2 serial number: '25CW018#040'
     """
     
-    def __init__(self, numAct=952, numActProfile=2048, maxVoltage=185, DMserial=0, **specs):
+    def __init__(self, numAct=952, numActProfile=2048, maxVoltage=185,
+                 DMserial=0, **specs):
         """
         BM1k constructor.
         Inputs:
@@ -18,9 +19,8 @@ class BM1k(DM):
             numActProfile - the number of actuators included in the profile (int)
             DMserial - the serial number of the DM (str (11 characters))
         """
-        
         # call the DM constructor
-        super().__init__(**self.specs)
+        super().__init__(**specs)
         
         # determine the correct DM
         self.allNums = {'25CW004#014': 1, '25CW018#040': 2}
@@ -29,9 +29,9 @@ class BM1k(DM):
         
         # load BM1k attributes
         self.connection = BMC()
-        self.numActProfile = int(self.specs.get('numActProfile', numActProfile))
-        self.numAct = int(self.specs.get('numAct', numAct))
-        self.maxVoltage = int(self.specs.get('maxVoltage', maxVoltage))
+        self.numActProfile = int(specs.get('numActProfile', numActProfile))
+        self.numAct = int(specs.get('numAct', numAct))
+        self.maxVoltage = int(specs.get('maxVoltage', maxVoltage))
         
         # get the flatmaps if running an actual experiment
         if self.labExperiment == True:
@@ -64,9 +64,9 @@ class BM1k(DM):
             num_actuators = self.connection.query('num_actuators')
             data = np.zeros(num_actuators)
             self.connection.command('send_data', data)
-            if self.specs.get('name') is None:
-                self.specs['name'] = 'DM'
-            print(self.specs.get('name') + ' zeroed')
+            if self.name is None:
+                self.name = 'DM' + self.DMnum
+            print(self.name + ' zeroed')
 
     def sendData(self, data):
         """
