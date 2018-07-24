@@ -80,6 +80,7 @@ class QSIrs61(Camera):
             # disconnects camera
             if self.connection.query('Connected') == True:
                 self.connection.command('Connected', False)
+            print('Camera now disabled')
                     
     def avgImg(self, expTime, numIm, Source = None, Xc = None, Yc = None,
                Rx = None, Ry = None):
@@ -120,13 +121,13 @@ class QSIrs61(Camera):
             if Ry is None:
                 Ry = self.imgSize[1] / 2
             # takes new dark image if needed
-            if self.darkCam == None:
+            if np.array(self.darkCam).all() == None:
                 # takes new darkCam
                 self.darkCam = self.takeDarkCam(.1, 30, Xc = Xc, Yc = Yc,
                                                 Rx = Rx, Ry = Ry )
-            elif self.darkCam is 0:
+            elif np.array(self.darkCam).all() == 0:
                 pass
-            elif np.shape(self.darkCam) != self.binnedImgSize:
+            elif np.shape(self.darkCam) != self.imgSize:
                 # darkCam properties and current image size don't match. Raises an
                 # errror
                 raise Exception("Provided dark cam image does not have the same "
@@ -134,8 +135,8 @@ class QSIrs61(Camera):
                                 "or the other, or take a new dark cam.")
             self.readoutSpeed(1)
             # creates a blank image as a placeholder
-            img = np.zeros((int(self.binnedImgSize),
-                               int(self.binnedImgSize)), np.int32)
+            img = np.zeros((int(self.imgSize[0]),
+                               int(self.imgSize[1])), np.int32)
             # takes numIm images and adds them together
             for i in range(numIm):
                 img = img + self.exposure(expTime)
@@ -282,11 +283,11 @@ class QSIrs61(Camera):
         """
         # set the properties necessary to take dark image
         self.shutter(False)
-        self.shutterpriority(0)
+        self.shutterPriority(0)
         self.readoutSpeed(0)
         # take dark image
         self.darkCam = 0
-        darkCam = self.avgimg(expTime, numIm, Xc = Xc, Yc = Yc, Rx = Rx,
+        darkCam = self.avgImg(expTime, numIm, Xc = Xc, Yc = Yc, Rx = Rx,
                               Ry = Ry)
         self.darkCam = darkCam[0]
         # display image if flag is not false

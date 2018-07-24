@@ -36,7 +36,7 @@ class MCLS1(Source):
         
         # connects to the laser
         if self.labExperiment is True:
-            from HCIFS.Utils.LabControl import SerialPort
+            from HCIFS.util.LabControl import SerialPort
             self.port = SerialPort(comPort=self.port)
     
     def enable(self):
