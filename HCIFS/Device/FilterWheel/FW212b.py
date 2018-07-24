@@ -31,8 +31,8 @@ class FW212b(FilterWheel):
         if not self.LabExperiment:
             super().getFilter()
         else:
-        # queries for current filter
-        return self.port.query('pos')
+            # queries for current filter
+            return self.port.query('pos')
     
     def setFilter(self, filterNum):
         """

@@ -19,7 +19,7 @@ class QSIrs61(Camera):
         """
         super().__init__(**specs)
         
-        self.saturation = int(specs.get('saturation', saturation)
+        self.saturation = int(specs.get('saturation', saturation))
         self.serialnum = specs.get('serialnum', serialnum)
         self.progId = specs.get('progID', progID)
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))

@@ -1,4 +1,3 @@
-from HCIFS.util.LabControl import ActiveX
 from HCIFS.Device.Camera.Camera import Camera
 import numpy as np
 import time
@@ -27,7 +26,7 @@ class SXvrh9(Camera):
         self.msec = 0.001;
         
         #set up instance variables
-        self.saturation = int(specs.get('saturation', saturation)
+        self.saturation = int(specs.get('saturation', saturation))
         self.progID = specs.get('progID', progID)
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         

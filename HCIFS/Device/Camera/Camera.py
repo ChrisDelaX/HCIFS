@@ -1,5 +1,6 @@
 from HCIFS.Device.Device import Device
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Camera(Device):
     """
@@ -29,7 +30,7 @@ class Camera(Device):
         self.binPix = np.array(specs.get('binPix', binPix), dtype = 'int')
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         self.darkCam = specs.get('darkCam', darkCam)
-        self.saturation = int(specs.get('saturation', saturation)
+        self.saturation = int(specs.get('saturation', saturation))
     
     def avgImg(self, expTime, numIm, Xc = None, Yc = None, Rx = None,
                Ry = None, Source = None):
