@@ -2,6 +2,7 @@
 # https://github.com/mcleu/PyAPT
 import time
 
+
 class LabControl():
     
     def __init__(self):
@@ -29,9 +30,20 @@ class PyAPT(LabControl):
             from PyAPT.PyAPT import APTMotor
             self.connection = APTMotor(SerialNum=serial_number, HWTYPE=device_type)
         except ModuleNotFoundError:
-            raise ModuleNotFoundError("'PyAPT' package is missing. " \
-                    + "Can't use APT LabControl. To run a simulation, " \
-                    + "make sure 'labExperiment = False'.")
+            print("'PyAPT' package is missing. Can't use APT LabControl.")
+    
+    def query(self, attribute):
+        return super().query(attribute)()
+
+class BMC(LabControl):
+    
+    def __init__(self):
+        super().__init__()
+        try:
+            import bmc
+            self.connection = bmc.BmcDm()
+        except ModuleNotFoundError:
+            print("'bmc' package is missing.Can't use BMC LabControl.")
     
     def query(self, attribute):
         return super().query(attribute)()
@@ -47,9 +59,7 @@ class ActiveX(LabControl):
             import win32com.client
             self.connection = win32com.client.Dispatch(name)
         except ModuleNotFoundError:
-            raise ModuleNotFoundError("'win32com' package is missing. " \
-                    + "Can't use ActiveX LabControl. To run a simulation, " \
-                    + "make sure 'labExperiment = False'.")
+            print("'win32com' package is missing. Can't use ActiveX LabControl.")
         
     def command(self, attribute, value):
         setattr(self.connection, attribute, value)
@@ -68,9 +78,7 @@ class SerialPort(LabControl):
                     bytesize=byteSize, stopbits=stopBits)
             self.connection.close()
         except ModuleNotFoundError:
-            raise ModuleNotFoundError("'serial' package is missing. " \
-                    + "Can't use SerialPort LabControl. To run a simulation, " \
-                    + "make sure 'labExperiment = False'.")
+            print("'serial' package is missing. Can't use SerialPort LabControl.")
     
     def query(self, attribute):
         """
