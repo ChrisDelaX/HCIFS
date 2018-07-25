@@ -16,6 +16,8 @@
   "Devices": [
     { "name": "Star",
       "type": "MCLS1",
+      "FWtype": "FW212b",
+      "FWport": "COM12",
       "channel": 1
     },
     { "name": "Planet",
