@@ -28,14 +28,16 @@ class BM1k(DM):
         self.DMnum = self.allNums.get(self.DMserial, 0)
         
         # load BM1k attributes
-        self.connection = BMC()
         self.numActProfile = int(specs.get('numActProfile', numActProfile))
         self.numAct = int(specs.get('numAct', numAct))
         self.maxVoltage = int(specs.get('maxVoltage', maxVoltage))
         
-        # get the flatmaps if running an actual experiment
+        # connect to the DM and enable it if running experiment
         if self.labExperiment == True:
+            self.connection = BMC()
+            self.enable()
             assert self.DMnum != 0, 'Must provide a valid serial number when running lab experiment'
+            # get the flatmaps
             if self.DMnum == 1:
                 self.flatMap = np.loadtxt('C:/Program Files/Boston Micromachines/Shapes/C25CW004#14_CLOSED_LOOP_200nm_Voltages_DM#1.txt')
             elif self.DMnum == 2:

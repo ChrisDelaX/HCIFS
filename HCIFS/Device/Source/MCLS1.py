@@ -34,10 +34,11 @@ class MCLS1(Source):
         lam =  {1: 635, 2: 658, 3: 670, 4: 705}
         self.lam = lam[self.channel]*u.nm                       # wavelength in nm
         
-        # connects to the laser
+        # connects to and enables the laser
         if self.labExperiment is True:
             from HCIFS.util.LabControl import SerialPort
             self.port = SerialPort(comPort=self.port)
+            self.enable()
             
     
     def enable(self):

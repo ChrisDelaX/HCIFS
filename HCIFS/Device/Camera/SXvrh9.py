@@ -30,10 +30,11 @@ class SXvrh9(Camera):
         self.progID = specs.get('progID', progID)
         self.ccdtemp = int(specs.get('ccdtemp', ccdtemp))
         
-        # Connect to the camera
+        # Connect to the camera and enable it
         if self.labExperiment is True:
             from HCIFS.Utils.LabControl import ActiveX
             self.connection = ActiveX(progID)
+            self.enable()
     
     def enable(self):
         """
