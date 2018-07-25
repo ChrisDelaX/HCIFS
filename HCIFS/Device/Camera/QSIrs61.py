@@ -127,7 +127,7 @@ class QSIrs61(Camera):
                                                 Rx = Rx, Ry = Ry )
             elif np.array(self.darkCam).all() == 0:
                 pass
-            elif np.shape(self.darkCam) != self.imgSize:
+            elif list(np.shape(self.darkCam)) != self.imgSize.tolist():
                 # darkCam properties and current image size don't match. Raises an
                 # errror
                 raise Exception("Provided dark cam image does not have the same "
@@ -294,6 +294,9 @@ class QSIrs61(Camera):
         if display != False:
             import matplotlib.pyplot as plt
             plt.imshow(darkCam)
+        self.shutter(True)
+        self.shutterPriority(1)
+        self.readoutSpeed(1)
         return darkCam[0]
 
 

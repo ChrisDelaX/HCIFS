@@ -38,6 +38,7 @@ class MCLS1(Source):
         if self.labExperiment is True:
             from HCIFS.util.LabControl import SerialPort
             self.port = SerialPort(comPort=self.port)
+            
     
     def enable(self):
         """
