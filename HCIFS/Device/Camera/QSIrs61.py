@@ -7,7 +7,7 @@ class QSIrs61(Camera):
     A class for controlling a QSIrs61 camera
     """
     
-    def __init__(self, saturation=30900, serialnum='0', progID ='QSICamera.CCDCamera', ccdtemp=-15,
+    def __init__(self, saturation=35000, serialnum='0', progID ='QSICamera.CCDCamera', ccdtemp=-15,
                  **specs):
         """
         Constructor for the QSIrs61 camera
@@ -25,7 +25,7 @@ class QSIrs61(Camera):
         
         # Connect to the camera and enable it
         if self.labExperiment is True:
-            from HCIFS.Utils.LabControl import ActiveX
+            from HCIFS.util.LabControl import ActiveX
             self.connection = ActiveX(progID)
             self.enable()
     
@@ -62,6 +62,7 @@ class QSIrs61(Camera):
                 # set camera gain to self gain
                 if self.connection.query('CameraGain') != 1:
                     self.connection.command('CameraGain', 1)
+                print("'QSIrs6' is now enabled'")
             # handles problems connecting to the camera
             except Exception as ex:
                 if ex == AttributeError:
@@ -86,7 +87,7 @@ class QSIrs61(Camera):
             # disconnects camera
             if self.connection.query('Connected') == True:
                 self.connection.command('Connected', False)
-            print('Camera now disabled')
+            print("'QSirs61' is now disabled")
                     
     def avgImg(self, expTime, numIm, Source = None, Xc = None, Yc = None,
                Rx = None, Ry = None):
@@ -198,12 +199,12 @@ class QSIrs61(Camera):
             super().exposureProperties(originPix, imgSize, binPix)
         else:
             # sends the exposure properties to the camera
+            self.connection.command('BinX', int(binPix[0]))
+            self.connection.command('BinY', int(binPix[1]))
             self.connection.command('StartX', int(originPix[0]))
             self.connection.command('StartY', int(originPix[1]))
             self.connection.command('NumX', int(imgSize[0]))
             self.connection.command('NumY', int(imgSize[1]))
-            self.connection.command('BinX', int(binPix[0]))
-            self.connection.command('BinY', int(binPix[1]))
             # update the camera attributes
             self.imgSize = imgSize
             self.originPix = originPix

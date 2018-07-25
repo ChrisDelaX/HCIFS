@@ -18,9 +18,7 @@ class SXvrh9(Camera):
         # call the 'Camera' constructor
         super().__init__(**specs)
         
-        # ensure image size is correct (instance variables created in 'Camera' constructor
-        if self.imgSize[0] > 1392 or self.imgSize[1] > 1040:
-            raise ValueError('image size must be less than 1392 X 1040')
+
         
         # set up time variables
         self.msec = 0.001;
@@ -32,7 +30,7 @@ class SXvrh9(Camera):
         
         # Connect to the camera and enable it
         if self.labExperiment is True:
-            from HCIFS.Utils.LabControl import ActiveX
+            from HCIFS.util.LabControl import ActiveX
             self.connection = ActiveX(progID)
             self.enable()
     
@@ -49,11 +47,11 @@ class SXvrh9(Camera):
             # turns on autodownload, allowing captured images to be sent immediately
             self.connection.command('AutoDownload', True)
             # sets the exposure properties to the correct values
-            self.exposureproperties(self.originPix, self.imgSize, self.binPix)
+            self.exposureProperties(self.originPix, self.imgSize, self.binPix)
             # turns on the camera cooler
             # TODO: find correct default temp to enable following line
 #            self.setTemperature(self.temperature)
-            print("'StarlightXpress' is now enabled")
+            print("'SXvrh9' is now enabled")
     
     def disable(self):
         """
@@ -66,7 +64,7 @@ class SXvrh9(Camera):
                 raise Exception('Camera not connected.')
             # disables the link to the camera and deletes the connection
             self.connection.command('LinkEnabled', False)
-            print("'StarlightXpress' is now disabled'")
+            print("'SXvrh9' is now disabled")
 
     def avgImg(self, expTime, numIm, Source = None, Xc = None, Yc = None,
                Rx = None, Ry = None):
@@ -97,40 +95,49 @@ class SXvrh9(Camera):
         else:
             if self.connection == None:
                 raise Exception('Camera not connected.')
-            # converts cropping numbers to binned pixels
             
-            Xc = Xc / self.binPix[0]
-            Yc = Yc / self.binPix[1]
-            Rx = Rx / self.binPix[0]
-            Ry = Ry / self.binPix[1]
-            # if cropping numbers given, whole image is used
+            # if cropping numbers not given, whole image is used else converts
+            # to binned pixels
             if Xc is None:
                 Xc = self.binnedImgSize[0] / 2
+            else:
+                Xc = Xc / self.binPix[0]
+                
             if Yc is None:
                 Yc = self.binnedImgSize[1] / 2
+            else:
+                Yc = Yc / self.binPix[1]      
+                
             if Rx is None:
                 Rx = self.binnedImgSize[0] / 2
+            else:
+                Rx = Rx / self.binPix[0]
+                
             if Ry is None:
                 Ry = self.binnedImgSize[1] / 2
+            else:
+                Ry = Ry / self.binPix[1]
+                
             # takes new dark image if needed
-            if self.darkCam == None:
+            if np.array(self.darkCam).all() == None:
                 assert Source != None, 'Must pass a source to take new dark image'
                 # takes new darkCam
-                self.darkCam = self.takeDarkCam(.1, 30, Xc = Xc * self.binPix[0],
-                          Yc = Yc * self.binPix[1], Rx = Rx * self.binPix[0],
-                          Ry = Ry * self.binPix[1])
-            elif self.darkCam is 0:
+                self.darkCam = self.takeDarkCam(.1, 30, Source = Source,
+                                                Xc = Xc * self.binPix[0],
+                                                Yc = Yc * self.binPix[1],
+                                                Rx = Rx * self.binPix[0],
+                                                Ry = Ry * self.binPix[1])
+            elif np.array(self.darkCam).all() == 0:
                 pass
-            elif np.shape(self.darkCam) != self.binnedImgSize:
+            elif list(np.shape(self.darkCam)) != self.imgSize.tolist():
                 # darkCam properties and current image size don't match. Raises an
                 # errror
                 raise Exception("Provided dark cam image does not have the same "
                                 "dimensions as the exposure properties. Change one "
                                 "or the other, or take a new dark cam.")
-            self.readoutspeed(1)
             # creates a blank image as a placeholder
-            img = np.zeros((int(self.binnedImgSize),
-                               int(self.binnedImgSize)), np.int32)
+            img = np.zeros((int(self.binnedImgSize[0]), int(self.binnedImgSize[1])),
+                           np.int32)
             # takes numIm images and adds them together
             for i in range(numIm):
                 img = img + self.exposure(expTime)
@@ -189,6 +196,10 @@ class SXvrh9(Camera):
         if not self.labExperiment:
             super().exposureProperties(originPix, imgSize, binPix)
         else:
+            
+            # ensure image size is correct (instance variables created in 'Camera' constructor
+            if self.imgSize[0] > 1392 or self.imgSize[1] > 1040:
+                raise ValueError('image size must be less than 1392 X 1040')
             # sets attributes
             self.originPix = originPix
             self.imgSize = imgSize
@@ -196,13 +207,14 @@ class SXvrh9(Camera):
             # sets binned attributes
             self.binnedOriginPix = (originPix[0] / binPix[0], originPix[1] / binPix[1])
             self.binnedImgSize = (imgSize[0] / binPix[0], imgSize[1] / binPix[1])
+            
             # sends exposure properties to camera
-            self.connection.command('StartX', self.binnedOriginPix[0])
-            self.connection.command('StartY', self.binnedOriginPix[1])
-            self.connection.command('NumX', self.binnedImgSize[0])
-            self.connection.command('NumY', imgSize[1])
-            self.connection.command('BinX', binPix[0])
-            self.connection.command('BinY', binPix[1])
+            self.connection.command('BinX', int(self.binPix[0]))
+            self.connection.command('BinY', int(self.binPix[1]))
+            self.connection.command('StartX', int(self.binnedOriginPix[0]))
+            self.connection.command('StartY', int(self.binnedOriginPix[1]))
+            self.connection.command('NumX', int(self.binnedImgSize[0]))
+            self.connection.command('NumY', int(self.binnedImgSize[1]))
     
     def setTemperature(self, temperature):
         """
@@ -230,14 +242,13 @@ class SXvrh9(Camera):
         display - if True displays the darkCam after it is taken (bool)
         """
         # set the properties necessary to take dark image
-        self.readoutSpeed(0)
         # turns current of laser to 0
         current = Source.current
         Source.changeCurrent(0)
         #self.exposureproperties((0,0,), (500, 500), (BinX, BinY))
         # take dark image
         self.darkCam = 0
-        darkCam = self.avgimg(expTime, numIm, Xc = Xc, Yc = Yc, Rx = Rx,
+        darkCam = self.avgImg(expTime, numIm, Xc = Xc, Yc = Yc, Rx = Rx,
                               Ry = Ry)
         self.darkCam = darkCam[0]
         # returns current to original value

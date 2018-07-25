@@ -52,7 +52,7 @@ class MCLS1(Source):
         else:
             # turns the system on by writing to the port
             self.port.command('system', 1)
-            print('Laser is now enabled')
+            print("'MCLS1' is now enabled")
             # closes the port
             time.sleep(2)
     
@@ -69,8 +69,7 @@ class MCLS1(Source):
             self.port.command('enable', 0)
             # turns off the whole system
             self.port.command('system', 0)
-            print('Laser is now disabled')
-            time.sleep(2)
+            print("'MCLS1' is now disabled")
         
     def status(self):
         """

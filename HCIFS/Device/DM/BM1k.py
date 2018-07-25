@@ -55,20 +55,52 @@ class BM1k(DM):
             assert status == 0, 'Error connecting to DM. Error: ' + str(status)
             numActProfile = self.connection.query('num_actuators')
             assert numActProfile == self.numActProfile, 'Wrong number of profile actuators entered'
-
-    def zero(self):
+            print("'BM1k' is now enabled")
+   
+    def disable(self):
         """
-        Zeros the voltage on all actuators
+        Disables the laser by zeroing the DM and then closing the connection.
         """
         if not self.labExperiment:
-            super().zero()
+            super().disable()
         else:
-            num_actuators = self.connection.query('num_actuators')
-            data = np.zeros(num_actuators)
-            self.connection.command('send_data', data)
-            if self.name is None:
-                self.name = 'DM' + self.DMnum
-            print(self.name + ' zeroed')
+            self.zero()
+            self.connection.query('close_dm')
+            print("'BM1k' is now disbaled")
+
+    def changeActuator(self, actuator, command):
+        """
+        Changes the voltage on a single actator
+        Inputs:
+            actuator - the number of the actuator to be changed (int)
+            command - the voltage to be applied to the actuator (int)
+        """
+        if not self.labExperiment:
+            super().changeActuator(actuator, command)
+        else:
+            assert actuator < self.numActProfile, 'actuator number must be less than 2048'
+            assert actuator > 0, 'actuator number must be greater than 0'
+            self.connection.command('poke', actuator, command/self.maxVoltage)
+            
+    def flatten(self):
+        """
+        Flattens the DM using the provided flatmaps
+        """
+        if not self.labExperiment:
+            super().flatten()
+        else:
+            self.sendData(self.flatMap)
+
+    def getCurentData(self):
+        """
+        Gets the current voltage on each actuator
+        Output:
+            data - voltage on each actuator (np array)
+        """
+        if not self.labExperiment:
+            super().getCurentData()
+        else:
+            return np.array(self.connection.query('get_actuator_data'))
 
     def sendData(self, data):
         """
@@ -99,47 +131,17 @@ class BM1k(DM):
             else:
                 raise Exception('Serial number not recognized')
             self.connection.command('send_data', data)
-    
-    def changeActuator(self, actuator, command):
+            
+    def zero(self):
         """
-        Changes the voltage on a single actator
-        Inputs:
-            actuator - the number of the actuator to be changed (int)
-            command - the voltage to be applied to the actuator (int)
+        Zeros the voltage on all actuators
         """
         if not self.labExperiment:
-            super().changeActuator(actuator, command)
+            super().zero()
         else:
-            assert actuator < self.numActProfile, 'actuator number must be less than 2048'
-            assert actuator > 0, 'actuator number must be greater than 0'
-            self.connection.command('poke', actuator, command/self.maxVoltage)
-
-    def getCurentData(self):
-        """
-        Gets the current voltage on each actuator
-        Output:
-            data - voltage on each actuator (np array)
-        """
-        if not self.labExperiment:
-            super().getCurentData()
-        else:
-            return np.array(self.connection.query('get_actuator_data'))
-    
-    def flatten(self):
-        """
-        Flattens the DM using the provided flatmaps
-        """
-        if not self.labExperiment:
-            super().flatten()
-        else:
-            self.sendData(self.flatMap)
-    
-    def disable(self):
-        """
-        Disables the laser by zeroing the DM and then closing the connection.
-        """
-        if not self.labExperiment:
-            super().disable()
-        else:
-            self.zero()
-            self.connection.query('close_dm')
+            num_actuators = self.connection.query('num_actuators')
+            data = np.zeros(num_actuators)
+            self.connection.command('send_data', data)
+            if self.name is None:
+                self.name = 'DM' + self.DMnum
+            print(self.name + ' zeroed')
