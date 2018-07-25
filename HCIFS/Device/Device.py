@@ -3,8 +3,8 @@ import astropy.units as u
 
 class Device(object):
     
-    def __init__(self, type=None, ID=0, position=[0,0,0], stageTypes=[None,None,None], 
-            stageSerials=[None,None,None], labExperiment=False, **specs):
+    def __init__(self, type='Device', ID=0, labExperiment=False, position=[0,0,0], 
+            stageTypes=[None,None,None], stageSerials=[None,None,None], **specs):
         """
         Creates an instance of the Prototype class within the Device module.
         The 'name' attribute is the only one that MUST be defined in the scriptfile.
@@ -14,19 +14,28 @@ class Device(object):
         """
         
         # default attributes of all devices
-        self.name = specs.get('name')                           # device name
+        self.name = specs.get('name')                              # device name
         assert self.name != None, "Must provide a name"
-        self.type = specs.get('type', type)                     # device type
-        self.ID = int(specs.get('ID', ID))                      # identification number
-        self.position = specs.get('position', position)*u.mm    # x,y,z position in mm
-        self.stageTypes = specs.get('stageTypes', stageTypes)   # (motor)stage types (x,y,z)
-        self.stageSerials = specs.get('stageSerials', stageSerials)# (motor)stage serials (x,y,z)
+        self.type = specs.get('type', type)                        # device type
+        self.ID = int(specs.get('ID', ID))                         # identification number
         self.labExperiment = bool(specs.get('labExperiment', labExperiment))# lab flag
-
+        self.position = specs.get('position', position)*u.mm       # default device position
+        # loop through axes x,y,z, look for any stages, and get real position
+        self.stageTypes = specs.get('stageTypes', stageTypes)      # (motor)stage types (x,y,z)
+        self.stageSerials = specs.get('stageSerials', stageSerials)# (motor)stage serials (x,y,z)
+        for i, (type, serial) in enumerate(zip(self.stageTypes, self.stageSerials)):
+            # get the specified module, or use the default 'Stage' module
+            type = type if type is not None else 'Stage'
+            # enable the Stage, get the position, then disable the Stage
+            module = get_module(type, 'Stage')
+            stagespecs = {'type':type, 'serial':serial, 'labExperiment':self.labExperiment}
+            Stage = getattr(module, type)(**stagespecs)
+            self.position[i] = Stage.pos
+            Stage.disable()
+    
     def enable(self):
         assert not self.labExperiment, "Can't 'enable' with a default device class."
-        print("Turn 'labExperiment = True' to run the lab.")
+        print("Turn 'labExperiment = True' to enable a Device.")
     
     def disable(self):
-        assert not self.labExperiment, "Can't 'enable' with a default device class."
-        print("Turn 'labExperiment = True' to run the lab.")
+        pass

@@ -41,7 +41,7 @@ class BMC(LabControl):
             import bmc
             self.connection = bmc.BmcDm()
         except ModuleNotFoundError:
-            print("'bmc' package is missing.Can't use BMC LabControl.")
+            print("'bmc' package is missing. Can't use BMC LabControl.")
     
     def query(self, attribute):
         return super().query(attribute)()

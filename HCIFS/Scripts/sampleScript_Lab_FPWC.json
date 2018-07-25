@@ -7,14 +7,12 @@
   "DMmodel": "influencingFunction",
   "DMpitch": 286.05e-6,
   
-  "loops": [
+  "dist2prev_FPWCloop": [
     ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L2", "FPWC"],
-    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L3", "IFS"]
-    ],
-  "distances": [
-    [1500, 600, 300, 600, 1000, 1500, 250, 300, 200],
-    [1500, 600, 300, 600, 1000, 1500, 250, 500, 700]
-    ],  
+    [0, 1500, 600, 300, 600, 1000, 1500, 250, 300, 200]],
+  "dist2prev_IFSloop": [
+    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L3", "IFS"],
+    [0, 1500, 600, 300, 600, 1000, 1500, 250, 500, 700]],
   "Devices": [
     { "name": "Star",
       "type": "MCLS1",
@@ -50,13 +48,16 @@
       "type": "BowtieSet",
       "stageTypes": ["MTS50", "MTS50", null],
       "stageSerials": ["83815646", "83815669", null],
-      "FPMchoice": 9
+      "numON": 9
     },
     { "name": "L1",
       "focal": 250
     },
     { "name": "L2",
       "focal": 200
+    },
+    { "name": "L3",
+      "focal": 700
     },
     { "name": "FPWC",
       "type": "QSIrs61",

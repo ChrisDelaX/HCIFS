@@ -4,6 +4,8 @@
 import os.path, json, inspect, glob
 from HCIFS.util.imports import get_module
 import numpy as np
+import astropy.units as u
+
 
 class Experiment(object):
     
@@ -28,71 +30,75 @@ class Experiment(object):
         # update local variable 'specs'
         specs = self.specs
         
+        # load the labExperiment flag
+        self.labExperiment = bool(specs.get('labExperiment', labExperiment))
+        
+        # check format of the Devices list of dictionaries from specs
+        assert 'Devices' in specs, "Devices not defined in specs."
+        devs = specs['Devices']
+        assert isinstance(devs, list) and all([isinstance(dev, dict) for dev in devs]), \
+                "Devices must be defined as a list of dicts."
+        assert all('name' in dev for dev in devs), "Each Device must have key 'name'."
+        assert len(devs) == len(set(dev['name'] for dev in devs)), \
+                "All Devices must have a unique name."
+        
         # create the Devices dictionary of modules (Source, Camera, DM, Mask, ...)
         self.Devices = dict()
-        # loop through the list of dictionaries in 'Devices'
-        devs = 'Devices'
-        assert devs in specs, "'%s' not defined in 'specs'."%devs
-        for ID, device in enumerate(specs[devs]):
-            assert isinstance(device, dict), "'%s' must be defined as a list of dicts."%devs
-            assert ('name' in device) and isinstance(device['name'], str), \
-                    "All elements of '%s' must have key 'name'."%devs
-            # update the device dictionary with useful keys
-            dev = dict({**device, 'ID':ID, 'labExperiment':labExperiment})
+        for ID, dev in enumerate(devs):
+            # create device dictionary with additional useful keys
+            devspecs = dict({**dev, 'ID':ID, 'labExperiment':labExperiment})
             # get the specified module, or use the default 'Device' module
-            modname = device.get('type', 'Device')
+            modname = dev.get('type', 'Device')
             module = get_module(modname)
-            self.Devices[device['name']] = getattr(module, modname)(**dev)
+            self.Devices[dev['name']] = getattr(module, modname)(**devspecs)
         
-        # Load the loops array, or create a default loop of Devices sorted by ID
-        loops = np.array(specs.get('loops', [dev.name for dev \
-                in sorted(self.Devices.values(), key=lambda dev: dev.ID)]), ndmin=2)
-        # create the FPWC and IFS loops.
-        if loops.shape[0] >= 2:
-            self.loop_FPWC = loops[0]
-            self.loop_IFS = loops[1]
-        else:
-            self.loop_FPWC = self.loop_IFS = loops
-        # Load the distances array, must be the size of loops minus 1. Default to zeros.
-        distances = np.array(specs.get('distances', np.zeros(loops.shape[1]-1)), ndmin=2)
-        # create the FPWC and IFS distances.
-        if distances.shape[0] >= 2:
-            self.distances_FPWC = distances[0]
-            self.distances_IFS = distances[1]
-        else:
-            self.distances_FPWC = self.distances_IFS = loops
+        # create the distance-to-previous arrays for both FPWC and IFS loops
+        # default loop: all devices sorted by ID, with distances equal zero
+        default =[[dev.name for dev in sorted(self.Devices.values(), \
+                key=lambda dev: dev.ID)], [0]*len(self.Devices)]
+        self.dist2prev_FPWCloop = specs.get('dist2prev_FPWCloop', default).copy()
+        self.dist2prev_IFSloop = specs.get('dist2prev_IFSloop', default).copy()
+        # set the units to mm
+        self.dist2prev_FPWCloop[1] *= u.mm
+        self.dist2prev_IFSloop[1] *= u.mm
 
-#### ADD assert shapes distances vs loops
 
-        
     def moveDevice(self, name, movement):
         """Check for motorized stages on a device, then change the position of the 
         device by introducing a relative movement in x,y,z.
         """
-        for i, (type, serial) in enumerate(zip(stageTypes, stageSerials)):
-            # get the specified module, or use the default 'Stage' module
-            type = type if type is not None else 'Stage'
-            # create a Stage
-            module = get_module(type, 'Stage')
-            Stage = getattr(module, type)(type=type, serial=serial)
-            Stage.moveDevice(movement)
-            # update the distances array
-            deltaZ = movement[2]
-            if deltaZ != 0:
-                if ID == 0:
-                    device.dist2next -= deltaZ
-                    self.distances[0] += deltaZ
-                    self.distances[1] -= deltaZ
-                else:
-                    self.optics[ID - 1].dist2next += deltaZ
-                    device.dist2next -= deltaZ
-                    self.distances[ID] += deltaZ
-                    self.distances[ID + 1] -= deltaZ   
+        # get device, stage types, and stage serials
+        dev = self.Devices[name]
+        types = dev.stageTypes
+        serials = dev.stageSerials
+        # loop through axes x,y,z
+        for i, (mvt, type, serial) in enumerate(zip(movement, types, serials)):
+            # for each axis, check if there is any movement, and change position
+            if mvt != 0:
+                dev.position[i] += mvt
+                # get the specified module, or use the default 'Stage' module
+                type = type if type is not None else 'Stage'
+                # enable the Stage, move the Device, then disable the Stage
+                module = get_module(type, 'Stage')
+                stagespecs = {'type':type, 'serial':serial, 'labExperiment':self.labExperiment}
+                Stage = getattr(module, type)(**stagespecs)
+                Stage.move(mvt)
+                Stage.disable()
+                # if device moves along z axis, update the dist2prev arrays
+                if i == 2:
+                    # FPWC loop
+                    for i, devname in enumerate(self.dist2prev_FPWCloop[0]):
+                        if devname == name:
+                            self.dist2prev_FPWCloop[1][i] += mvt
+                            if i < len(self.dist2prev_FPWCloop[0]) - 1:
+                                self.dist2prev_FPWCloop[1][i+1] -= mvt
+                    # IFS loop
+                    for i, devname in enumerate(self.dist2prev_IFSloop[0]):
+                        if devname == name:
+                            self.dist2prev_IFSloop[1][i] += mvt
+                            if i < len(self.dist2prev_IFSloop[0]) - 1:
+                                self.dist2prev_IFSloop[1][i+1] -= mvt
 
-
-                
-        
-        
 
     def runLaboratory(self):
         

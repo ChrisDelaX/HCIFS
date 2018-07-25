@@ -18,6 +18,6 @@ class BowtieSet(Mask):
         
         # load specific BowtieSet attributes
         self.numON = int(specs.get('numON', numON))     # mask ON number
-        self.numOFF = int(specs.get('numON', numON))    # mask ON number
+        self.numOFF = int(specs.get('numOFF', numOFF))  # mask OFF number
         self.posON = self.allPos[self.numON]
         self.posOFF = self.allPos[self.numOFF]
