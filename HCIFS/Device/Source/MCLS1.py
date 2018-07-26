@@ -65,6 +65,8 @@ class MCLS1(Source):
         if not self.labExperiment:
             super().disable()
         else:
+            # sets the current to zero
+            self.changeCurrent(0)
             # disables the current channel
             self.port.command('enable', 0)
             # turns off the whole system
@@ -111,7 +113,7 @@ class MCLS1(Source):
                 self.port.command('current', current)
                 self.current = current
     
-    def calibrate(self, camera):
+    def calibrate(self, camera, fraction = .8):
         """
         Calibrates the MCLS1 so that the central peak is overasaturated, and
         the second peaks are just below saturated.
@@ -171,8 +173,8 @@ class MCLS1(Source):
         # changes power until the second peak intensity falls within 70-80%
         # of saturation
         counter = 0
-        while intensity < .7 * saturation or intensity > .8 * saturation:
-            if intensity < .7:
+        while intensity <  .9 * fraction * saturation or intensity > 1.1 * fraction * saturation:
+            if intensity < .9 * fraction * saturation:
                 newCurrent += 5
             else:
                 newCurrent -= 2

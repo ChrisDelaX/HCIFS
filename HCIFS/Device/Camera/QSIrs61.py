@@ -144,6 +144,7 @@ class QSIrs61(Camera):
             # creates a blank image as a placeholder
             img = np.zeros((int(self.imgSize[0]),
                                int(self.imgSize[1])), np.int32)
+            saturated = False
             # takes numIm images and adds them together
             for i in range(numIm):
                 img = img + self.exposure(expTime)
@@ -156,7 +157,7 @@ class QSIrs61(Camera):
                                             int(Yc - Ry) : int(Yc + Ry)]
             # checks to see if image is saturated
             saturated = False
-            if np.max(img) >= self.saturation:
+            if np.max(avgImgCropped) >= self.saturation:
                 saturated = True
 
             return avgImgCropped, saturated
