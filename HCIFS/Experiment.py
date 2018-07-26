@@ -99,8 +99,13 @@ class Experiment(object):
                             if i < len(self.dist2prev_IFSloop[0]) - 1:
                                 self.dist2prev_IFSloop[1][i+1] -= mvt
 
+    def closeLab(self):
+        """ Disconnect all devices from the lab. 
+        """
+        for dev in self.Devices.values():
+            dev.disable()
 
-    def runLaboratory(self):
+    def runFPWC(self):
         
         # win32com package must be installed to run the lab (Windows platform only)
         try:
@@ -117,17 +122,7 @@ class Experiment(object):
         # change the focal plane mask
         # calibrate the laser
         center, secondary = self.Laser.calibrate()
-    
 
-
-    def closeLab(self, ):
-        # disconnect and shut off the camera
-        self.Camera.disconnect()
-        # change the current on the laser to zero
-        self.Laser.changeCurrent(0, self.laser.specs['channel'])
-        # turn off and disconnect the laser
-        self.Laser.disbale()
-    
-    def runSimulation(self, **specs):
+    def runIFS(self, ):
         
         pass

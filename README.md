@@ -23,10 +23,13 @@ from HCIFS.Experiment import Experiment
 # create an HCIFS Experiment 
 expt = Experiment('sampleScript_Lab_FPWC')
 
-# run a lab experiment
-expt.runLab()
-# run a simulation
-expt.runSim()
+# run wavefront control on the Focal Plane Wavefront Control (FPWC) loop
+expt.runWavefrontControl('FPWC')
+# or on the Integral Field Spectrograph (IFS) loop
+expt.runWavefrontControl('IFS')
+
+# generate a datacube using the IFS
+expt.IFScube()
 ```
 
 Acknowledgements
