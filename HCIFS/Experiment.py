@@ -48,7 +48,7 @@ class Experiment(object):
             # create device dictionary with additional useful keys
             devspecs = dict({**dev, 'ID':ID, 'labExperiment':labExperiment})
             # get the specified module, or use the default 'Device' module
-            modname = dev.get('type', 'Device')
+            modname = dev.get('device', 'Device')
             module = get_module(modname)
             self.Devices[dev['name']] = getattr(module, modname)(**devspecs)
         
@@ -69,19 +69,19 @@ class Experiment(object):
         """
         # get device, stage types, and stage serials
         dev = self.Devices[name]
-        types = dev.stageTypes
+        stages = dev.stageTypes
         serials = dev.stageSerials
         # loop through axes x,y,z
-        for i, (mvt, type, serial) in enumerate(zip(movement, types, serials)):
+        for i, (mvt, stage, serial) in enumerate(zip(movement, stages, serials)):
             # for each axis, check if there is any movement, and change position
             if mvt != 0:
                 dev.position[i] += mvt
                 # get the specified module, or use the default 'Stage' module
-                type = type if type is not None else 'Stage'
+                stage = stage if stage is not None else 'Stage'
                 # enable the Stage, move the Device, then disable the Stage
-                module = get_module(type, 'Stage')
-                stagespecs = {'type':type, 'serial':serial, 'labExperiment':self.labExperiment}
-                Stage = getattr(module, type)(**stagespecs)
+                module = get_module(stage, 'Stage')
+                stagespecs = {'stageType':stage, 'serial':serial, 'labExperiment':self.labExperiment}
+                Stage = getattr(module, stage)(**stagespecs)
                 Stage.move(mvt)
                 Stage.disable()
                 # if device moves along z axis, update the dist2prev arrays
@@ -98,7 +98,37 @@ class Experiment(object):
                             self.dist2prev_IFSloop[1][i] += mvt
                             if i < len(self.dist2prev_IFSloop[0]) - 1:
                                 self.dist2prev_IFSloop[1][i+1] -= mvt
-
+    
+    def turnWheel(self, name, number):
+        """
+        Check for wheel on a device, then rotate the wheel to the correct number
+        
+        Inputs:
+            name - the name of the device with an attached wheel (str)
+            number - the position to rotate the wheel to (int)
+        """
+        
+        # get the device, wheel type, and the wheel's port
+        dev = self.Devices[name]
+        FWtype = dev.FWtype
+        FWport = dev.FWport
+        # creates a wheel object
+        module = get_module(FWtype, 'FilterWheel')
+        wheelspecs = {'port': FWport, 'labExperiment': self.labExperiment}
+        FilterWheel = getattr(module, FWtype)(**wheelspecs)
+        # changes the filter
+        FilterWheel.setFilter(number)
+        # corrects source's lamda and bandwidth if necessary
+        devMax = dev.lam + dev.bandwidth / 2
+        devMin = dev.lam - dev.bandwidth / 2
+        filterMax = FilterWheel.lam + FilterWheel.bandwidth / 2
+        filterMin = FilterWheel.lam  - FilterWheel.bandwidth / 2
+        newMax = min([devMax, filterMax])
+        newMin = max([devMin, filterMin])
+        assert newMin <= newMax, "Filter selection would block all light"
+        dev.bandwidth = newMax - newMin
+        dev.lam = newMin + dev.bandwidth / 2
+        
     def closeLab(self):
         """ Disconnect all devices from the lab. 
         """

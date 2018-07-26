@@ -2,10 +2,10 @@ import astropy.units as u
 
 class Stage(object):
     
-    def __init__(self, type='Stage', serial=None, pos=0, vel=0, acc=0, 
+    def __init__(self, stageType='Stage', serial=None, pos=0, vel=0, acc=0, 
             maxtravel=100, labExperiment=False, **specs):
         
-        self.type = specs.get('type', type)
+        self.stageType = specs.get('stageType', stageType)
         self.serial = specs.get('serial', serial)
         self.pos = specs.get('pos', pos)*u.mm
         self.vel = specs.get('vel', vel)*u.mm/u.s

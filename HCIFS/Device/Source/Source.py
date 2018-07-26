@@ -4,7 +4,8 @@ class Source(Device):
     """
     A class used to represent sources.
     """
-    def __init__(self, npixCalib=10, **specs):
+    def __init__(self, npixCalib=10, FWtype = 'FilterWheel', FWport = 0,
+                 **specs):
         """
         Constructor of the dummy class for source.
         
@@ -15,6 +16,8 @@ class Source(Device):
         
         # default attributes specific to Sources
         self.npixCalib = int(specs.get('npixCalib', npixCalib)) # length of calibration area
+        self.FWtype = specs.get('FWtype', FWtype)
+        self.FWport = int(specs.get('FWport', FWport))
     
     def status(self):
         """

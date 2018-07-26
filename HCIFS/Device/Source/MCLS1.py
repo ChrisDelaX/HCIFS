@@ -12,7 +12,8 @@ class MCLS1(Source):
     computer through a com port or com-usb connection. The enable method
     must be called before the source can be used.
     """
-    def __init__(self, port='COM3', current=0, channel=1, **specs):
+    def __init__(self, port='COM3', current=0, channel=1,
+                 fwModname = 'FW212b', **specs):
         """
         Constructor for the MCLS1 class.
         
@@ -23,7 +24,7 @@ class MCLS1(Source):
         
         """
         # call the Sources constructor
-        super().__init__(**specs)
+        super().__init__(fwModname = fwModname, **specs)
         
         # load laser attribute values
         self.port = str(specs.get('port', port))                # the port
@@ -31,10 +32,13 @@ class MCLS1(Source):
         self.channel = int(specs.get('channel', channel))       # selected channel (1-4)
         maxCurrent = {1: 68.09, 2: 63.89, 3: 41.59, 4: 67.39}
         self.maxCurrent = maxCurrent[self.channel]              # max current allowed
+        self.bandwidth = 0                                      # monochromatic source
         lam =  {1: 635, 2: 658, 3: 670, 4: 705}
         self.lam = lam[self.channel]*u.nm                       # wavelength in nm
+        # sees if lamda falls within the filterwheel
         
         # connects to and enables the laser
+        #  then adjusts attributes based on filterwheel
         if self.labExperiment is True:
             from HCIFS.util.LabControl import SerialPort
             self.port = SerialPort(comPort=self.port)

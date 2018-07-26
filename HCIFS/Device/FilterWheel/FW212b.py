@@ -1,5 +1,6 @@
 from HCIFS.Device.FilterWheel.FilterWheel import FilterWheel
 from HCIFS.util.LabControl import SerialPort
+import astropy.units as u
 
 class FW212b(FilterWheel):
     """
@@ -36,7 +37,7 @@ class FW212b(FilterWheel):
         
         
     """
-    def __init__(self, port='COM12', numOfFilters=12, **specs):
+    def __init__(self, port='COM12', numOfFilters=12, currentFilter = 12, **specs):
         """
         Constructor for the 'FW212b' class.
         Inputs:
@@ -46,13 +47,31 @@ class FW212b(FilterWheel):
         # call the 'FilterWheel' class __init__
         super().__init__(**specs)
         
+        self.allFilters = [{'lam': 0*u.nm, 'bandwidth': 0*u.nm},
+                        {'lam': 550*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 577*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 600*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 620*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 632.8*u.nm, 'bandwidth': 3*u.nm},
+                        {'lam': 640*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 650*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 670*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 694.3*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 720*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 740*u.nm, 'bandwidth': 10*u.nm},
+                        {'lam': 650*u.nm, 'bandwidth': 80*u.nm}]
+        
         # create attributes
         self.port = specs.get('port', port)
         self.numOfFilters = int(specs.get('numOfFilters', numOfFilters))
+        self.currentFilter = int(specs.get('currentFilter', currentFilter))
         
-        # connects to the filter wheel
+        # sets filter to currentFilter and gets its info
+        self.setFilter(self.currentFilter)
+
         if self.labExperiment == True:
             self.port = SerialPort(comPort = self.port)
+
     
     def getFilter(self):
         """
@@ -70,6 +89,9 @@ class FW212b(FilterWheel):
         Changes the position of the filter wheel
         pos must be an integer from 1 - 12
         """
+        # changes attributes based on filter
+        self.lam = self.allFilters[self.currentFilter].get('lam')
+        self.bandwidth = self.allFilters[self.currentFilter].get('bandwidth')
         if not self.labExperiment:
             super().setFilter(filter)
         else:

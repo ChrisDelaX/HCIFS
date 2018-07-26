@@ -15,39 +15,39 @@
     [0, 1500, 600, 300, 600, 1000, 1500, 250, 500, 700]],
   "Devices": [
     { "name": "Star",
-      "type": "MCLS1",
+      "device": "MCLS1",
       "FWtype": "FW212b",
       "FWport": "COM12",
       "channel": 1
     },
     { "name": "Planet",
-      "type": "MCLS1",
+      "device": "MCLS1",
       "channel": 2
     },
     { "name": "Simu",
-      "type": "Source",
+      "device": "Source",
       "lam": 800
     },
     { "name": "OAP1",
       "focal": 1500
     },
     { "name": "DM1",
-      "type": "BM1k",
+      "device": "BM1k",
       "DMserial": "25CW004#014"
     },
     { "name": "DM2",
-      "type": "BM1k",
+      "device": "BM1k",
       "DMserial": "25CW018#040",
       "deadAct": [5, 10]
     },
     { "name": "SP",
-      "type": "Ripple3"
+      "device": "Ripple3"
     },
     { "name": "OAP2",
       "focal": 1500
     },
     { "name": "FPM",
-      "type": "BowtieSet",
+      "device": "BowtieSet",
       "stageTypes": ["MTS50", "MTS50", null],
       "stageSerials": ["83815646", "83815669", null],
       "numON": 9
@@ -62,12 +62,12 @@
       "focal": 700
     },
     { "name": "FPWC",
-      "type": "QSIrs61",
+      "device": "QSIrs61",
       "stageTypes": [null, null, "LTS300"],
       "stageSerials": [null, null, "45862339"]
     },
     { "name": "IFS",
-      "type": "SXvrh9"
+      "device": "SXvrh9"
     }
   ]
 }

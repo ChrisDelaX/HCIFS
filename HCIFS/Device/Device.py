@@ -3,7 +3,7 @@ import astropy.units as u
 
 class Device(object):
     
-    def __init__(self, type='Device', ID=0, labExperiment=False, position=[0,0,0], 
+    def __init__(self, device='Device', ID=0, labExperiment=False, position=[0,0,0], 
             stageTypes=[None,None,None], stageSerials=[None,None,None], **specs):
         """
         Creates an instance of the Prototype class within the Device module.
@@ -16,20 +16,20 @@ class Device(object):
         # default attributes of all devices
         self.name = specs.get('name')                              # device name
         assert self.name != None, "Must provide a name"
-        self.type = specs.get('type', type)                        # device type
+        self.device = specs.get('device', device)                        # device type
         self.ID = int(specs.get('ID', ID))                         # identification number
         self.labExperiment = bool(specs.get('labExperiment', labExperiment))# lab flag
         self.position = specs.get('position', position)*u.mm       # default device position
         # loop through axes x,y,z, look for any stages, and get real position
         self.stageTypes = specs.get('stageTypes', stageTypes)      # (motor)stage types (x,y,z)
         self.stageSerials = specs.get('stageSerials', stageSerials)# (motor)stage serials (x,y,z)
-        for i, (type, serial) in enumerate(zip(self.stageTypes, self.stageSerials)):
+        for i, (stageType, serial) in enumerate(zip(self.stageTypes, self.stageSerials)):
             # get the specified module, or use the default 'Stage' module
-            type = type if type is not None else 'Stage'
+            stageType = stageType if stageType is not None else 'Stage'
             # enable the Stage, get the position, then disable the Stage
-            module = get_module(type, 'Stage')
-            stagespecs = {'type':type, 'serial':serial, 'labExperiment':self.labExperiment}
-            Stage = getattr(module, type)(**stagespecs)
+            module = get_module(stageType, 'Stage')
+            stagespecs = {'stageType':stageType, 'serial':serial, 'labExperiment':self.labExperiment}
+            Stage = getattr(module, stageType)(**stagespecs)
             self.position[i] = Stage.pos
             Stage.disable()
     
