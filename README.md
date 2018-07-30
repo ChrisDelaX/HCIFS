@@ -36,4 +36,4 @@ Acknowledgements
 -------------------------------
 Created by Christian Delacroix
 
-Written by Matthew Grossman, He Sun, Katherine Mumm, and Christian Delacroix.
+Written by Matthew Grossman, He Sun, and Christian Delacroix.
