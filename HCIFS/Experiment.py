@@ -56,11 +56,11 @@ class Experiment(object):
         # default loop: all devices sorted by ID, with distances equal zero
         default =[[dev.name for dev in sorted(self.Devices.values(), \
                 key=lambda dev: dev.ID)], [0]*len(self.Devices)]
-        self.dist2prev_FPWCloop = specs.get('dist2prev_FPWCloop', default).copy()
-        self.dist2prev_IFSloop = specs.get('dist2prev_IFSloop', default).copy()
+        self.dist2prev_Imag = specs.get('dist2prev_Imag', default).copy()
+        self.dist2prev_Spec = specs.get('dist2prev_Spec', default).copy()
         # set the units to mm
-        self.dist2prev_FPWCloop[1] *= u.mm
-        self.dist2prev_IFSloop[1] *= u.mm
+        self.dist2prev_Imag[1] *= u.mm
+        self.dist2prev_Spec[1] *= u.mm
 
 
     def moveDevice(self, name, movement):
@@ -87,17 +87,17 @@ class Experiment(object):
                 # if device moves along z axis, update the dist2prev arrays
                 if i == 2:
                     # FPWC loop
-                    for i, devname in enumerate(self.dist2prev_FPWCloop[0]):
+                    for i, devname in enumerate(self.dist2prev_Imag[0]):
                         if devname == name:
-                            self.dist2prev_FPWCloop[1][i] += mvt
-                            if i < len(self.dist2prev_FPWCloop[0]) - 1:
-                                self.dist2prev_FPWCloop[1][i+1] -= mvt
+                            self.dist2prev_Imag[1][i] += mvt
+                            if i < len(self.dist2prev_Imag[0]) - 1:
+                                self.dist2prev_Imag[1][i+1] -= mvt
                     # IFS loop
-                    for i, devname in enumerate(self.dist2prev_IFSloop[0]):
+                    for i, devname in enumerate(self.dist2prev_Spec[0]):
                         if devname == name:
-                            self.dist2prev_IFSloop[1][i] += mvt
-                            if i < len(self.dist2prev_IFSloop[0]) - 1:
-                                self.dist2prev_IFSloop[1][i+1] -= mvt
+                            self.dist2prev_Spec[1][i] += mvt
+                            if i < len(self.dist2prev_Spec[0]) - 1:
+                                self.dist2prev_Spec[1][i+1] -= mvt
     
     def turnWheel(self, name, number):
         """

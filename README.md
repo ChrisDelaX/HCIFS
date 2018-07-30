@@ -23,10 +23,10 @@ from HCIFS.Experiment import Experiment
 # create an HCIFS Experiment 
 expt = Experiment('sampleScript_Lab_FPWC')
 
-# run wavefront control on the Focal Plane Wavefront Control (FPWC) loop
-expt.runWavefrontControl('FPWC')
-# or on the Integral Field Spectrograph (IFS) loop
-expt.runWavefrontControl('IFS')
+# run wavefront control in imaging mode (QSI camera)
+expt.runWavefrontControl('Imag')
+# run wavefront control in spectrograph mode (IFS)
+expt.runWavefrontControl('Spec')
 
 # generate a datacube using the IFS
 expt.IFScube()
