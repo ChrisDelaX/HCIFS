@@ -32,6 +32,16 @@ expt.runFPWC('Spec')
 expt.getDatacube()
 ```
 
+Publications
+-------------------------------
+* The shaped pupil coronagraph for planet finding coronagraphy: optimization, sensitivity, and laboratory testing, Kasdin et al. 2004
+* Optimal dark hole generation via two deformable mirrors with stroke minimization, Pueyo et al. 2009
+* Kalman filtering techniques for focal plane electric field estimation, Groff and Kasdin 2013
+* Recursive starlight and bias estimation for high-contrast imaging with an extended Kalman filter, Riggs, Kasdin, and Groff 2016
+* Methods and limitations of focal plane sensing, estimation, and control in high-contrast imaging, Groff et al. 2015
+* Identification of the focal plane wavefront control system using EM algorithm, Sun, Kasdin, and Vanderbei 2017
+* First light of the High Contrast Integral Field Spectrograph (HCIFS), Delacroix, Sun, Galvin, et al. 2018
+
 Acknowledgements
 -------------------------------
 Created by Christian Delacroix
