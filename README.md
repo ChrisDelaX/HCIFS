@@ -24,12 +24,12 @@ from HCIFS.Experiment import Experiment
 expt = Experiment('sampleScript_Lab_FPWC')
 
 # run wavefront control in imaging mode (QSI camera)
-expt.runWavefrontControl('Imag')
+expt.runFPWC('Imag')
 # run wavefront control in spectrograph mode (IFS)
-expt.runWavefrontControl('Spec')
+expt.runFPWC('Spec')
 
 # generate a datacube using the IFS
-expt.IFScube()
+expt.getDatacube()
 ```
 
 Acknowledgements
