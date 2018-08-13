@@ -17,7 +17,7 @@ class Experiment(object):
         # ensure JSON file location
         if not os.path.isfile(jsonfile):
             jsonfile = os.path.join(os.path.split(inspect.getfile(self.__class__))[0], \
-                    'Scripts', jsonfile)
+                    'script', jsonfile)
         try:
             # load JSON script file
             self.specs = json.loads(open(jsonfile).read())
