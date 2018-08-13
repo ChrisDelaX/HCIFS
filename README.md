@@ -21,7 +21,7 @@ import HCIFS
 from HCIFS.Experiment import Experiment
 
 # create an HCIFS Experiment 
-expt = Experiment('sampleScript_Lab_FPWC')
+expt = Experiment('sampleScript')
 
 # run wavefront control in imaging mode (QSI camera)
 expt.runFPWC('Imag')

@@ -62,8 +62,13 @@ class Experiment(object):
         self.dist2prev_Imag[1] *= u.mm
         self.dist2prev_Spec[1] *= u.mm
 
+    def closeLab(self):
+        """ Disconnect all devices from the lab. 
+        """
+        for dev in self.Devices.values():
+            dev.disable()
 
-    def moveDevice(self, name, movement):
+    def moveStage(self, name, movement):
         """Check for motorized stages on a device, then change the position of the 
         device by introducing a relative movement in x,y,z.
         """
@@ -129,20 +134,9 @@ class Experiment(object):
         dev.bandwidth = newMax - newMin
         dev.lam = newMin + dev.bandwidth / 2
         
-    def closeLab(self):
-        """ Disconnect all devices from the lab. 
-        """
-        for dev in self.Devices.values():
-            dev.disable()
 
-    def runFPWC(self):
+    def runFPWC(self, mode):
         
-        # win32com package must be installed to run the lab (Windows platform only)
-        try:
-            import win32com.client
-        except ImportError:
-            raise ImportError("Can't control the camera without win32com package.")
-
         # connect the camera
         self.Camera.connect()
         # initiate the camera
@@ -153,6 +147,6 @@ class Experiment(object):
         # calibrate the laser
         center, secondary = self.Laser.calibrate()
 
-    def runIFS(self, ):
+    def getDataCube(self):
         
         pass

@@ -1,0 +1,71 @@
+{
+  "labExperiment": false,
+  "nbIter": 30,
+  "cRange": [-8, -3],
+  "planet": false,
+  
+  "DMmodel": "influencingFunction",
+  "DMpitch": 286.05e-6,
+  
+  "dist2prev_Imag": [
+    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L2", "Imag"],
+    [0, 1500, 600, 300, 600, 1000, 1500, 250, 300, 200]],
+  "dist2prev_Spec": [
+    ["Star", "OAP1", "DM1", "DM2", "SP", "OAP2", "FPM", "L1", "L3", "Spec"],
+    [0, 1500, 600, 300, 600, 1000, 1500, 250, 500, 700]],
+  "Devices": [
+    { "name": "Star",
+      "device": "MCLS1",
+      "channel": 1
+    },
+    { "name": "Planet",
+      "device": "MCLS1",
+      "channel": 2
+    },
+    { "name": "Simu",
+      "device": "Source",
+      "lam": 800
+    },
+    { "name": "OAP1",
+      "focal": 1500
+    },
+    { "name": "DM1",
+      "device": "BM1k",
+      "DMserial": "25CW004#014"
+    },
+    { "name": "DM2",
+      "device": "BM1k",
+      "DMserial": "25CW018#040",
+      "deadAct": [5, 10]
+    },
+    { "name": "SP",
+      "device": "Ripple3"
+    },
+    { "name": "OAP2",
+      "focal": 1500
+    },
+    { "name": "FPM",
+      "device": "BowtieSet",
+      "stageTypes": ["MTS50", "MTS50", null],
+      "stageSerials": ["83815646", "83815669", null],
+      "numON": 9
+    },
+    { "name": "L1",
+      "focal": 250
+    },
+    { "name": "L2",
+      "focal": 200
+    },
+    { "name": "L3",
+      "focal": 700
+    },
+    { "name": "Imag",
+      "device": "QSIrs61",
+      "stageTypes": [null, null, "LTS300"],
+      "stageSerials": [null, null, "45862339"]
+    },
+    { "name": "Spec",
+      "device": "SXvrh9"
+    }
+  ]
+}

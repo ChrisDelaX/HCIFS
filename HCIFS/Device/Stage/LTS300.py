@@ -1,5 +1,4 @@
 from HCIFS.Device.Stage.MTS50 import MTS50
-from HCIFS.util.LabControl import PyAPT
 
 
 class LTS300(MTS50):
