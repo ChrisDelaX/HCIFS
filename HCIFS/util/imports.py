@@ -39,8 +39,8 @@ def get_full_modname(pypath=''):
     
     # create full module name
     root_path = get_folder()
-    full_modname = path.replace(root_path, '').replace('/', '.') if root_path \
-                in path else os.path.basename(path)
+    full_modname = path.replace(root_path, '').replace('/', '.').replace('\\', '.') \
+                if root_path in path else os.path.basename(path)
     
     return full_modname
 
